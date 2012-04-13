@@ -5,9 +5,9 @@
 #working_dir = getcwd()
 #
 #SpecRunner(
-#    SpecLoader(
-#        walker(working_dir),     # command line--where to start
-#        Importer(working_dir)),  # command line--what to import
-#    SpecExecutor(),
-#    TerseConsoleReporter()   # command line--verbosity, type of report
+#  SpecLoader(
+#    walker(working_dir),     # command line--where to start
+#    Importer(working_dir)),  # command line--what to import
+#  SpecExecutor(),
+#  TerseConsoleReporter()   # command line--verbosity, type of report
 #).run_specs()
