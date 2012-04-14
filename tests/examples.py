@@ -31,6 +31,7 @@ class fully_implemented_and_passing(Spec):
   def cleanup(self):
     self.executed_steps.append('after')
 
+
 class spec_with_failure(Spec):
   @then
   def it_should_fail(self):
