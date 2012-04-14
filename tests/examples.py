@@ -1,8 +1,9 @@
+from pyspecs.should import this
 from pyspecs.spec import Spec
 from pyspecs.steps import then, collect, when, after, given
 
 
-class FullyImplementedPassing(Spec):
+class fully_implemented_and_passing(Spec):
   def __init__(self):
     self.executed_steps = []
 
@@ -29,3 +30,8 @@ class FullyImplementedPassing(Spec):
   @after
   def cleanup(self):
     self.executed_steps.append('after')
+
+class spec_with_failure(Spec):
+  @then
+  def it_should_fail(self):
+    this(False).should.be(True)

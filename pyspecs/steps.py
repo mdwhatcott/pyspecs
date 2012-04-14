@@ -1,6 +1,5 @@
 PYSPECS_PREFIX = '_pyspecs_'
 PYSPECS_STEP = PYSPECS_PREFIX + 'step'
-SPEC_DESCRIPTION = PYSPECS_PREFIX + 'description'
 SPEC = 'spec'
 GIVEN_STEP = 'given'
 WHEN_STEP = 'when'
@@ -18,10 +17,7 @@ ALL_STEPS = [
 
 def _step(name):
   def decorator(object):
-    description = object.__name__.replace('_', ' ')
-    setattr(object, SPEC_DESCRIPTION, description)
     setattr(object, PYSPECS_STEP, name)
-    print 'hello: {0}'.format(description)
     return object
   return decorator
 
