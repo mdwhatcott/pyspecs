@@ -64,13 +64,13 @@ class TestSpecWithAssertionError(TestCase):
     self.assertIsInstance(error, Exception)
 
   def test_result_should_contain_any_output_logged_before_exception(self):
-    self.assertEqual("Hello, World!\n", self.result.output)
+    self.assertTrue(self.result.output.startswith("Hello, World!\n"))
 
   def test_remaining_assertions_are_invoked(self):
     self.assertTrue(self.spec.other_assertion)
 
   def test_remaining_steps_are_invoked(self):
-    self.assertTrue(self.spec.after_step)
+    self.assertTrue(self.result.output.endswith(AFTER_STEP))
 
 
 class TestSpecWithStepErrorBeforeAssertions(TestCase):

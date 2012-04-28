@@ -1,6 +1,6 @@
 from pyspecs.should import this
 from pyspecs.spec import Spec
-from pyspecs.steps import then, collect, when, after, given
+from pyspecs.steps import then, collect, when, after, given, WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
 
 
 class fully_implemented_and_passing(Spec):
@@ -51,4 +51,26 @@ class spec_with_assertion_error(Spec):
 
   @after
   def cleanup(self):
-    self.after_step = True
+    print AFTER_STEP,
+
+
+class spec_with_error_before_assertions(Spec):
+  @given
+  def an_exception_is_raised(self):
+    raise KeyError('Exception in "given"')
+
+  @when
+  def this_should_not_execute(self):
+    print WHEN_STEP
+
+  @collect
+  def this_should_not_execute_either(self):
+    print COLLECT_STEP
+
+  @then
+  def should_not_be_executed(self):
+    print THEN_STEP
+
+  @after
+  def should_not_execute(self):
+    print AFTER_STEP

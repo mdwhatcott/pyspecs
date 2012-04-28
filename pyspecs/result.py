@@ -19,7 +19,8 @@ class SpecResult(object):
 
   @property
   def passed(self):
-    return all(error is None or not error for error in self.errors.values())
+    return all(error is None or not error
+      for error in self.errors.values())
 
   def start_timer(self):
     self._stdout = sys.stdout
