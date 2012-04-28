@@ -35,4 +35,20 @@ class fully_implemented_and_passing(Spec):
 class spec_with_failure(Spec):
   @then
   def it_should_fail(self):
+    print "Hello, World!"
     this(False).should.be(True)
+
+
+class spec_with_assertion_error(Spec):
+  @then
+  def it_should_raise_an_error(self):
+    print "Hello, World!"
+    raise KeyError('Missing key!')
+
+  @then
+  def it_should_run_other_assertions(self):
+    self.other_assertion = True
+
+  @after
+  def cleanup(self):
+    self.after_step = True
