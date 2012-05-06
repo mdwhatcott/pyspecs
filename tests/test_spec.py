@@ -8,7 +8,7 @@ from tests.examples import \
     spec_with_failure, \
     spec_with_assertion_error, \
     spec_with_error_before_assertions, \
-    spec_with_error_after_assertions
+    spec_with_error_after_assertions, spec_with_error_before_and_after_assertions
 
 
 class TestSpecMethodExecutionOrder(TestCase):
@@ -129,18 +129,36 @@ class TestSpecWithErrorAfterAssertions(TestCase):
         self.assertTrue(self.result.output.count(THEN_STEP) == 2)
         self.assertNotIn(AFTER_STEP, self.result.output)
 
+
 class TestSpecWithErrorsBeforeAndAfterAssertions(TestCase):
     def setUp(self):
-        pass
+        self.spec = spec_with_error_before_and_after_assertions()
+        self.result = self.spec.execute()
+        self.output = self.result.output
 
     def test_result_should_convey_pre_assertion_error(self):
-        pass
+        self.assertTrue('collect' in self.result.errors)
+        name, error = self.result.errors['collect']
+        self.assertEqual('result', name)
+        self.assertIsInstance(error, KeyError)
 
     def test_result_should_convey_post_assertion_error(self):
-        pass
+        self.assertTrue('after' in self.result.errors)
+        name, error = self.result.errors['after']
+        self.assertEqual('an exception is raised', name)
+        self.assertIsInstance(error, ValueError)
 
     def test_all_output_previous_to_first_exception_is_captured(self):
-        pass
+        self.assertIn(GIVEN_STEP, self.output)
+        self.assertIn(WHEN_STEP, self.output)
+        self.assertIn(COLLECT_STEP, self.output)
+
+    def test_no_assertions_attempted(self):
+        self.assertNotIn(THEN_STEP, self.output)
 
     def test_all_output_previous_to_second_exception_is_captured(self):
-        pass
+        self.assertIn(AFTER_STEP, self.output)
+
+
+class TestSpecWithNoAssertions(TestCase):
+    pass

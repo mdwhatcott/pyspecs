@@ -2,7 +2,9 @@ from collections import defaultdict
 from inspect import getmembers, ismethod
 from pyspecs.result import SpecResult
 from pyspecs.should import ShouldError
-from pyspecs.steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, GIVEN_STEP, WHEN_STEP, COLLECT_STEP, AFTER_STEP
+from pyspecs.steps import \
+    PYSPECS_STEP, ALL_STEPS, THEN_STEP, GIVEN_STEP, \
+    WHEN_STEP, COLLECT_STEP, AFTER_STEP
 
 
 class Spec(object):

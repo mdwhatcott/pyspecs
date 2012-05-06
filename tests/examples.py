@@ -3,6 +3,7 @@ from pyspecs.spec import Spec
 from pyspecs.steps import \
     then, collect, when, after, given, \
     WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP, GIVEN_STEP
+from tests import raise_error
 
 
 class fully_implemented_and_passing(Spec):
@@ -60,7 +61,7 @@ class spec_with_error_before_assertions(Spec):
     @given
     def an_exception_is_raised(self):
         print GIVEN_STEP
-        raise KeyError('Exception in "given"')
+        raise_error(KeyError, 'Exception in "given"')
 
     @when
     def this_should_NOT_execute(self):
@@ -101,9 +102,33 @@ class spec_with_error_after_assertions(Spec):
 
     @after
     def an_exception_is_raised(self):
-        raise_key_error()
+        raise_error(KeyError, "Exception from 'after' step.")
         print AFTER_STEP
 
 
-def raise_key_error():
-    raise KeyError
+class spec_with_error_before_and_after_assertions(Spec):
+    @given
+    def setup(self):
+        print GIVEN_STEP
+
+    @when
+    def action(self):
+        print WHEN_STEP
+
+    @collect
+    def result(self):
+        print COLLECT_STEP
+        raise_error(KeyError, "Exception from 'collect' step.")
+
+    @then
+    def something(self):
+        print THEN_STEP
+
+    @then
+    def something_else(self):
+        print THEN_STEP
+
+    @after
+    def an_exception_is_raised(self):
+        print AFTER_STEP
+        raise_error(ValueError, "Exception from 'after' step.")
