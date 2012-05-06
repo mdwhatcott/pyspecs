@@ -1,4 +1,4 @@
-from unittest.case import TestCase, skip
+from unittest.case import TestCase
 import sys
 from pyspecs.should import ShouldError
 from pyspecs.steps import \
@@ -43,9 +43,9 @@ class TestFullPassingSpec(TestCase):
         )
         self.assertEqual('cleanup', self.result.names[AFTER_STEP])
 
+
 class TestSpecWithAssertionFailure(TestCase):
     def setUp(self):
-        self.stdout = sys.stdout
         self.spec = spec_with_failure()
         self.result = self.spec.execute()
 
@@ -61,13 +61,9 @@ class TestSpecWithAssertionFailure(TestCase):
     def test_it_should_run_fast(self):
         self.assertAlmostEqual(0, self.result.duration().total_seconds(), 1)
 
-    @skip('It feels like the python unittest framework is swapping stdout.')
     def test_stdout_should_have_been_restored(self):
-        self.assertEqual(sys.stdout, self.result._output)
         self.assertIsInstance(sys.stdout, file)
 
-    def tearDown(self):
-        sys.stdout = self.stdout
 
 class TestSpecWithAssertionError(TestCase):
     def setUp(self):
@@ -90,7 +86,7 @@ class TestSpecWithAssertionError(TestCase):
         self.assertTrue(self.result.output.endswith(AFTER_STEP))
 
 
-class TestSpecWithStepErrorBeforeAssertions(TestCase):
+class TestSpecWithErrorBeforeAssertions(TestCase):
     def setUp(self):
         self.spec = spec_with_error_before_assertions()
         self.result = self.spec.execute()
@@ -115,7 +111,7 @@ class TestSpecWithStepErrorBeforeAssertions(TestCase):
         self.assertIn(AFTER_STEP, self.result.output)
 
 
-class TestSpecWithStepErrorAfterAssertions(TestCase):
+class TestSpecWithErrorAfterAssertions(TestCase):
     def setUp(self):
         self.spec = spec_with_error_after_assertions()
         self.result = self.spec.execute()
@@ -132,3 +128,19 @@ class TestSpecWithStepErrorAfterAssertions(TestCase):
         self.assertIn(COLLECT_STEP, self.result.output)
         self.assertTrue(self.result.output.count(THEN_STEP) == 2)
         self.assertNotIn(AFTER_STEP, self.result.output)
+
+class TestSpecWithErrorsBeforeAndAfterAssertions(TestCase):
+    def setUp(self):
+        pass
+
+    def test_result_should_convey_pre_assertion_error(self):
+        pass
+
+    def test_result_should_convey_post_assertion_error(self):
+        pass
+
+    def test_all_output_previous_to_first_exception_is_captured(self):
+        pass
+
+    def test_all_output_previous_to_second_exception_is_captured(self):
+        pass

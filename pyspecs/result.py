@@ -5,13 +5,11 @@ from pyspecs.steps import THEN_STEP, ALL_STEPS, SPEC
 
 
 class SpecResult(object):
-    _stdout = sys.stdout
-
     def __init__(self, spec_name):
         self.names = dict.fromkeys(ALL_STEPS)
         self.errors = dict.fromkeys(ALL_STEPS)
         self.failures = list()
-        self._output = StringIO()
+        self._capture = StringIO()
         self.names[THEN_STEP] = list()
         self.errors[THEN_STEP] = list()
         self._started = datetime.datetime.utcnow()
@@ -27,12 +25,12 @@ class SpecResult(object):
 
     @property
     def output(self):
-        return self._output.getvalue()
+        return self._capture.getvalue()
 
     def __enter__(self):
-        sys.stdout = self._output
+        sys.stdout = self._capture
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.stdout = self._stdout
+        sys.stdout = sys.__stdout__
         return not any((exc_type, exc_val, exc_tb))
