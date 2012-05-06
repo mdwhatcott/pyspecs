@@ -2,7 +2,7 @@ from pyspecs.should import this
 from pyspecs.spec import Spec
 from pyspecs.steps import \
     then, collect, when, after, given, \
-    WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
+    WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP, GIVEN_STEP
 
 
 class fully_implemented_and_passing(Spec):
@@ -59,20 +59,51 @@ class spec_with_assertion_error(Spec):
 class spec_with_error_before_assertions(Spec):
     @given
     def an_exception_is_raised(self):
+        print GIVEN_STEP
         raise KeyError('Exception in "given"')
 
     @when
-    def this_should_not_execute(self):
+    def this_should_NOT_execute(self):
         print WHEN_STEP
 
     @collect
-    def this_should_not_execute_either(self):
+    def this_should_NOT_execute_either(self):
         print COLLECT_STEP
 
     @then
-    def should_not_be_executed(self):
+    def should_NOT_be_executed(self):
         print THEN_STEP
 
     @after
-    def should_not_execute(self):
+    def should_be_executed_to_clean_up(self):
         print AFTER_STEP
+
+class spec_with_error_after_assertions(Spec):
+    @given
+    def setup(self):
+        print GIVEN_STEP
+
+    @when
+    def action(self):
+        print WHEN_STEP
+
+    @collect
+    def result(self):
+        print COLLECT_STEP
+
+    @then
+    def something(self):
+        print THEN_STEP
+
+    @then
+    def something_else(self):
+        print THEN_STEP
+
+    @after
+    def an_exception_is_raised(self):
+        raise_key_error()
+        print AFTER_STEP
+
+
+def raise_key_error():
+    raise KeyError

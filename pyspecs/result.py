@@ -5,6 +5,8 @@ from pyspecs.steps import THEN_STEP, ALL_STEPS, SPEC
 
 
 class SpecResult(object):
+    _stdout = sys.stdout
+
     def __init__(self, spec_name):
         self.names = dict.fromkeys(ALL_STEPS)
         self.errors = dict.fromkeys(ALL_STEPS)
@@ -12,29 +14,25 @@ class SpecResult(object):
         self._output = StringIO()
         self.names[THEN_STEP] = list()
         self.errors[THEN_STEP] = list()
-        self._started = None
-        self._stopped = None
+        self._started = datetime.datetime.utcnow()
         self.names[SPEC] = spec_name
-        self._stdout = None
 
     @property
     def passed(self):
         return all(error is None or not error
             for error in self.errors.values())
 
-    def start_timer(self):
-        self._stdout = sys.stdout
-        sys.stdout = self._output
-        self._started = datetime.datetime.utcnow()
-
-    def stop_timer(self):
-        sys.stdout = self._stdout
-        self._stopped = datetime.datetime.utcnow()
-
-    @property
     def duration(self):
-        return self._stopped - self._started
+        return datetime.datetime.utcnow() - self._started
 
     @property
     def output(self):
         return self._output.getvalue()
+
+    def __enter__(self):
+        sys.stdout = self._output
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout = self._stdout
+        return not any((exc_type, exc_val, exc_tb))

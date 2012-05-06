@@ -1,9 +1,14 @@
-from unittest.case import TestCase
+from unittest.case import TestCase, skip
+import sys
 from pyspecs.should import ShouldError
 from pyspecs.steps import \
     GIVEN_STEP, SPEC, WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
 from tests.examples import \
-    fully_implemented_and_passing, spec_with_failure, spec_with_assertion_error
+    fully_implemented_and_passing, \
+    spec_with_failure, \
+    spec_with_assertion_error, \
+    spec_with_error_before_assertions, \
+    spec_with_error_after_assertions
 
 
 class TestSpecMethodExecutionOrder(TestCase):
@@ -24,7 +29,7 @@ class TestFullPassingSpec(TestCase):
         self.result = self.spec.execute()
 
     def test_result_populated_with_correct_statistics(self):
-        self.assertAlmostEqual(0, self.result.duration.total_seconds(), 1)
+        self.assertAlmostEqual(0, self.result.duration().total_seconds(), 1)
         self.assertFalse(any(self.result.errors.values()))
         self.assertEqual(str(), self.result.output)
         self.assertEqual(
@@ -40,6 +45,7 @@ class TestFullPassingSpec(TestCase):
 
 class TestSpecWithAssertionFailure(TestCase):
     def setUp(self):
+        self.stdout = sys.stdout
         self.spec = spec_with_failure()
         self.result = self.spec.execute()
 
@@ -52,6 +58,16 @@ class TestSpecWithAssertionFailure(TestCase):
     def test_result_should_contain_any_output(self):
         self.assertEqual('Hello, World!\n', self.result.output)
 
+    def test_it_should_run_fast(self):
+        self.assertAlmostEqual(0, self.result.duration().total_seconds(), 1)
+
+    @skip('It feels like the python unittest framework is swapping stdout.')
+    def test_stdout_should_have_been_restored(self):
+        self.assertEqual(sys.stdout, self.result._output)
+        self.assertIsInstance(sys.stdout, file)
+
+    def tearDown(self):
+        sys.stdout = self.stdout
 
 class TestSpecWithAssertionError(TestCase):
     def setUp(self):
@@ -75,22 +91,44 @@ class TestSpecWithAssertionError(TestCase):
 
 
 class TestSpecWithStepErrorBeforeAssertions(TestCase):
+    def setUp(self):
+        self.spec = spec_with_error_before_assertions()
+        self.result = self.spec.execute()
+
     def test_result_should_convey_the_exception(self):
-        pass
+        self.assertTrue('given' in self.result.errors)
+        name, error = self.result.errors['given']
+        self.assertEqual('an exception is raised', name)
+        self.assertIsInstance(error, KeyError)
+
+    def test_pre_assertion_steps_should_NOT_be_invoked(self):
+        self.assertNotIn(WHEN_STEP, self.result.output)
+        self.assertNotIn(COLLECT_STEP, self.result.output)
 
     def test_assertions_should_NOT_be_invoked(self):
-        pass
+        self.assertNotIn(WHEN_STEP, self.result.output)
 
     def test_all_output_previous_to_exception_is_captured(self):
-        pass
+        self.assertIn(GIVEN_STEP, self.result.output)
 
     def test_cleanup_attempted(self):
-        pass
+        self.assertIn(AFTER_STEP, self.result.output)
 
 
 class TestSpecWithStepErrorAfterAssertions(TestCase):
+    def setUp(self):
+        self.spec = spec_with_error_after_assertions()
+        self.result = self.spec.execute()
+
     def test_result_should_convey_the_exception(self):
-        pass
+        self.assertTrue('after' in self.result.errors)
+        name, error = self.result.errors['after']
+        self.assertEqual('an exception is raised', name)
+        self.assertIsInstance(error, KeyError)
 
     def test_all_output_previous_to_exception_is_captured(self):
-        pass
+        self.assertIn(GIVEN_STEP, self.result.output)
+        self.assertIn(WHEN_STEP, self.result.output)
+        self.assertIn(COLLECT_STEP, self.result.output)
+        self.assertTrue(self.result.output.count(THEN_STEP) == 2)
+        self.assertNotIn(AFTER_STEP, self.result.output)
