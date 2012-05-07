@@ -4,6 +4,11 @@ import sys
 from pyspecs.steps import THEN_STEP, ALL_STEPS, SPEC
 
 
+class UnimplementedSpecResult(object):
+    def __init__(self, spec_name):
+        self.spec_name = spec_name
+
+
 class SpecResult(object):
     def __init__(self, spec_name):
         self.names = dict.fromkeys(ALL_STEPS)

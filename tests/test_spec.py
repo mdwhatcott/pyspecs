@@ -1,5 +1,6 @@
 from unittest.case import TestCase
 import sys
+from pyspecs.result import UnimplementedSpecResult
 from pyspecs.should import ShouldError
 from pyspecs.steps import \
     GIVEN_STEP, SPEC, WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
@@ -156,4 +157,13 @@ class TestSpecWithErrorsBeforeAndAfterAssertions(TestCase):
 
 
 class TestSpecWithNoAssertions(TestCase):
-    pass
+    def setUp(self):
+        self.spec = examples.spec_without_assertions()
+        self.result = self.spec.execute()
+
+    def test_no_steps_should_be_executed(self):
+        self.assertFalse(len(self.spec.executed))
+
+    def test_result_should_indicate_that_the_spec_is_not_implemented(self):
+        self.assertIsInstance(self.result, UnimplementedSpecResult)
+        self.assertEqual(self.result.spec_name, 'spec without assertions')

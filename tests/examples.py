@@ -132,3 +132,24 @@ class spec_with_error_before_and_after_assertions(Spec):
     def an_exception_is_raised(self):
         print AFTER_STEP
         raise_error(ValueError, "Exception from 'after' step.")
+
+
+class spec_without_assertions(Spec):
+    def __init__(self):
+        self.executed = []
+
+    @given
+    def setup(self):
+        self.executed.append(GIVEN_STEP)
+
+    @when
+    def action(self):
+        self.executed.append(WHEN_STEP)
+
+    @collect
+    def result(self):
+        self.executed.append(COLLECT_STEP)
+
+    @after
+    def cleanup(self):
+        self.executed.append(AFTER_STEP)
