@@ -3,17 +3,12 @@ import sys
 from pyspecs.should import ShouldError
 from pyspecs.steps import \
     GIVEN_STEP, SPEC, WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
-from tests.examples import \
-    fully_implemented_and_passing, \
-    spec_with_failure, \
-    spec_with_assertion_error, \
-    spec_with_error_before_assertions, \
-    spec_with_error_after_assertions, spec_with_error_before_and_after_assertions
+from tests import examples
 
 
 class TestSpecMethodExecutionOrder(TestCase):
     def setUp(self):
-        self.spec = fully_implemented_and_passing()
+        self.spec = examples.fully_implemented_and_passing()
         self.spec.execute()
 
     def test_methods_run_in_correct_order(self):
@@ -25,7 +20,7 @@ class TestSpecMethodExecutionOrder(TestCase):
 
 class TestFullPassingSpec(TestCase):
     def setUp(self):
-        self.spec = fully_implemented_and_passing()
+        self.spec = examples.fully_implemented_and_passing()
         self.result = self.spec.execute()
 
     def test_result_populated_with_correct_statistics(self):
@@ -46,7 +41,7 @@ class TestFullPassingSpec(TestCase):
 
 class TestSpecWithAssertionFailure(TestCase):
     def setUp(self):
-        self.spec = spec_with_failure()
+        self.spec = examples.spec_with_failure()
         self.result = self.spec.execute()
 
     def test_result_should_convey_failure(self):
@@ -67,7 +62,7 @@ class TestSpecWithAssertionFailure(TestCase):
 
 class TestSpecWithAssertionError(TestCase):
     def setUp(self):
-        self.spec = spec_with_assertion_error()
+        self.spec = examples.spec_with_assertion_error()
         self.result = self.spec.execute()
 
     def test_result_should_convey_the_exception(self):
@@ -88,7 +83,7 @@ class TestSpecWithAssertionError(TestCase):
 
 class TestSpecWithErrorBeforeAssertions(TestCase):
     def setUp(self):
-        self.spec = spec_with_error_before_assertions()
+        self.spec = examples.spec_with_error_before_assertions()
         self.result = self.spec.execute()
 
     def test_result_should_convey_the_exception(self):
@@ -113,7 +108,7 @@ class TestSpecWithErrorBeforeAssertions(TestCase):
 
 class TestSpecWithErrorAfterAssertions(TestCase):
     def setUp(self):
-        self.spec = spec_with_error_after_assertions()
+        self.spec = examples.spec_with_error_after_assertions()
         self.result = self.spec.execute()
 
     def test_result_should_convey_the_exception(self):
@@ -132,7 +127,7 @@ class TestSpecWithErrorAfterAssertions(TestCase):
 
 class TestSpecWithErrorsBeforeAndAfterAssertions(TestCase):
     def setUp(self):
-        self.spec = spec_with_error_before_and_after_assertions()
+        self.spec = examples.spec_with_error_before_and_after_assertions()
         self.result = self.spec.execute()
         self.output = self.result.output
 

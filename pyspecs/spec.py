@@ -27,18 +27,15 @@ class Spec(object):
                 self._steps[step] = method
 
     def _execute_steps(self):
-        ok = self._execute_step(GIVEN_STEP, self._steps[GIVEN_STEP])
-        if ok:
-            ok = self._execute_step(WHEN_STEP, self._steps[WHEN_STEP])
-        if ok:
-            ok = self._execute_step(COLLECT_STEP, self._steps[COLLECT_STEP])
-        if ok:
-            self._execute_assertions(THEN_STEP, self._steps[THEN_STEP])
+        if self._execute_step(GIVEN_STEP):
+            if self._execute_step(WHEN_STEP):
+                if self._execute_step(COLLECT_STEP):
+                    self._execute_assertions()
 
-        self._execute_step(AFTER_STEP, self._steps[AFTER_STEP])
+        self._execute_step(AFTER_STEP)
 
-    def _execute_assertions(self, name, step):
-        for assertion in step:
+    def _execute_assertions(self):
+        for assertion in self._steps[THEN_STEP]:
             description = self._describe(assertion)
             try:
                 with self._result:
@@ -46,11 +43,13 @@ class Spec(object):
             except ShouldError as e:
                 self._result.failures.append((description, e))
             except Exception as e:
-                self._result.errors[name].append((description, e))
+                self._result.errors[THEN_STEP].append((description, e))
             else:
-                self._result.names[name].append(description)
+                self._result.names[THEN_STEP].append(description)
 
-    def _execute_step(self, name, step):
+    def _execute_step(self, name):
+        step = self._steps[name]
+
         if step is None:
             return True
 
