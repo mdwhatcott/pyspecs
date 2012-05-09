@@ -14,9 +14,9 @@ class Spec(object):
 
     def _build_result(self):
         if not len(self._steps[THEN_STEP]):
-            return UnimplementedSpecResult(self._describe(self.__class__))
+            return UnimplementedSpecResult(self.describe(self.__class__))
 
-        self._result = SpecResult(self._describe(self.__class__))
+        self._result = SpecResult(self.describe(self.__class__))
         self._execute_steps()
         return self._result
 
@@ -42,7 +42,7 @@ class Spec(object):
 
     def _execute_assertions(self):
         for assertion in self._steps[THEN_STEP]:
-            description = self._describe(assertion)
+            description = self.describe(assertion)
             try:
                 with self._result:
                     assertion(self)
@@ -59,7 +59,7 @@ class Spec(object):
         if step is None:
             return True
 
-        description = self._describe(step)
+        description = self.describe(step)
         try:
             with self._result:
                 step(self)
@@ -70,5 +70,6 @@ class Spec(object):
             self._result.names[name] = description
             return True
 
-    def _describe(self, obj):
+    @staticmethod
+    def describe(obj):
         return obj.__name__.replace('_', ' ')

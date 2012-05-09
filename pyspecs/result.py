@@ -9,7 +9,13 @@ class UnimplementedSpecResult(object):
         self.spec_name = spec_name
 
 
+class BrokenSpecResult(object):
+    def __init__(self, spec_name):
+        self.spec_name = spec_name
+
+
 class SpecResult(object):
+    # TODO: all fields should be filled out via methods
     def __init__(self, spec_name):
         self.names = dict.fromkeys(ALL_STEPS)
         self.errors = dict.fromkeys(ALL_STEPS)
