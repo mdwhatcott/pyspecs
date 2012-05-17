@@ -1,6 +1,6 @@
+from pyspecs import given, when, collect, then, after, spec, this
 from pyspecs._steps import \
     GIVEN_STEP, WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
-from pyspecs.spec import given, when, collect, then, after, spec, this
 from tests import raise_error
 
 
