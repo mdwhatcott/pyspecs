@@ -1,7 +1,6 @@
 from unittest.case import TestCase
 from pyspecs.should import this, expectation, ShouldError, PREPARATION_ERROR
 
-
 class TestShouldAssertions(TestCase):
     def setUp(self):
         self.lower = 'string'

@@ -1,5 +1,6 @@
-from pyspecs.result import BrokenSpecResult
-from pyspecs.spec import Spec
+from itertools import chain
+from pyspecs.spec import SpecSteps
+
 
 class SpecRunner(object):
     def __init__(self, loader, reporter):
@@ -7,14 +8,9 @@ class SpecRunner(object):
         self.reporter = reporter
 
     def run_specs(self):
-        for spec in self.loader.load_specs():
-            result = self._execute(spec)
-            self.reporter.report(result)
+        for step in chain(self._spec_steps()):
+            step.execute()
 
-    def _execute(self, spec):
-        try:
-            spec = spec()
-        except Exception:
-            return BrokenSpecResult(Spec.describe(spec))
-        else:
-            return spec.execute()
+    def _spec_steps(self):
+        for spec in self.loader.load_specs():
+            yield SpecSteps(self.reporter, spec().___collect_steps()) # TODO: initialization error

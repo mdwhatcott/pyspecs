@@ -1,75 +1,92 @@
-from collections import defaultdict
+from collections import OrderedDict
 from inspect import getmembers, ismethod
-from pyspecs.result import SpecResult, UnimplementedSpecResult
+import sys
 from pyspecs.should import ShouldError
-from pyspecs.steps import \
-    PYSPECS_STEP, ALL_STEPS, THEN_STEP, GIVEN_STEP, \
-    WHEN_STEP, COLLECT_STEP, AFTER_STEP
+from pyspecs.steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP
+
+
+class SpecSteps(object):
+    def __init__(self, reporter, steps):
+        self.reporter = reporter
+        self.steps = steps
+        for step in self.steps:
+            step.with_callbacks(self._success, self._failure, self._error)
+        self._current_index = 0
+
+    def __iter__(self):
+        return self._iterator()
+
+    @property
+    def _current(self):
+        return self.steps[self._current_index] \
+            if len(self.steps) > self._current_index \
+            else None
+
+    def _iterator(self):
+        while self._current is not None:
+            yield self._current
+
+    def _error(self, exc_stuff):
+        self.reporter.error(self._current, exc_stuff)
+        if self._current.step != THEN_STEP:
+            self._current_index = len(self.steps)
+
+    def _failure(self, exc_stuff):
+        if self._current.step == THEN_STEP:
+            self.reporter.failure(self._current, exc_stuff)
+            self._current_index += 1
+        else:
+            self._error(exc_stuff)
+
+    def _success(self):
+        self.reporter.success(self._current)
+        self._current_index += 1
+
+
+class Step(object):
+    def __init__(self, spec, step, name, action):
+        self.spec = spec
+        self.step = step
+        self.name = name
+        self._action = action
+        self._on_success = None
+        self._on_failure = None
+        self._on_error = None
+
+    def with_callbacks(self, success, failure, error):
+        self._on_success = success
+        self._on_failure = failure
+        self._on_error = error
+
+    def execute(self):
+        try:
+            self._action(self.spec)
+        except ShouldError:
+            self._on_failure(sys.exc_info())
+        except Exception:
+            self._on_error(sys.exc_info())
+        else:
+            self._on_success()
 
 
 class Spec(object):
-    def execute(self):
-        self._collect_steps()
-        return self._build_result()
+    def ___collect_steps(self):
+        steps = OrderedDict.fromkeys(ALL_STEPS)
+        steps[THEN_STEP] = list()
 
-    def _build_result(self):
-        if not len(self._steps[THEN_STEP]):
-            return UnimplementedSpecResult(self.describe(self.__class__))
-
-        self._result = SpecResult(self.describe(self.__class__))
-        self._execute_steps()
-        return self._result
-
-    def _collect_steps(self):
-        self._steps = defaultdict.fromkeys(ALL_STEPS)
-        self._steps[THEN_STEP] = list()
         for name, method in getmembers(self.__class__, ismethod):
             step = getattr(method, PYSPECS_STEP, None)
-            if step is None or step not in self._steps:
+            if step is None or step not in steps:
                 continue
+
+            spec_name = describe(self.__class__)
+            description = describe(name)
             if step == THEN_STEP:
-                self._steps[step].append(method)
+                steps[step].append(Step(spec_name, step, description, method))
             else:
-                self._steps[step] = method
+                steps[step] = Step(spec_name, step, description, method)
 
-    def _execute_steps(self):
-        if self._execute_step(GIVEN_STEP):
-            if self._execute_step(WHEN_STEP):
-                if self._execute_step(COLLECT_STEP):
-                    self._execute_assertions()
+        return steps.values()
 
-        self._execute_step(AFTER_STEP)
-
-    def _execute_assertions(self):
-        for assertion in self._steps[THEN_STEP]:
-            description = self.describe(assertion)
-            try:
-                with self._result:
-                    assertion(self)
-            except ShouldError as e:
-                self._result.failures.append((description, e))
-            except Exception as e:
-                self._result.errors[THEN_STEP].append((description, e))
-            else:
-                self._result.names[THEN_STEP].append(description)
-
-    def _execute_step(self, name):
-        step = self._steps[name]
-
-        if step is None:
-            return True
-
-        description = self.describe(step)
-        try:
-            with self._result:
-                step(self)
-        except Exception as e:
-            self._result.errors[name] = (description, e)
-            return False
-        else:
-            self._result.names[name] = description
-            return True
-
-    @staticmethod
-    def describe(obj):
-        return obj.__name__.replace('_', ' ')
+def describe(obj):
+    return obj.__name__.replace('_', ' ')

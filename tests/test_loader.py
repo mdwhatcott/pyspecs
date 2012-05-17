@@ -1,7 +1,6 @@
 from unittest.case import TestCase
 from pyspecs.loader import SpecLoader, Location
 from pyspecs.spec import Spec
-from pyspecs.steps import then
 
 
 class TestLoadSpecFromSpecModule(TestCase):
