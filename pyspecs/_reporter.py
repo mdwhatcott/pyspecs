@@ -17,7 +17,7 @@ from abc import abstractmethod
 
 class Reporter(object):
     @abstractmethod
-    def success(self, step):
+    def success(self, spec_name, step, step_name):
         pass
 
     @abstractmethod
@@ -30,7 +30,7 @@ class Reporter(object):
 
 
 class DotReporter(Reporter):
-    def success(self, step):
+    def success(self, spec_name, step, step_name):
         pass
 
     def failure(self, step, exc_stuff):

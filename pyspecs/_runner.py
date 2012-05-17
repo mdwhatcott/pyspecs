@@ -54,7 +54,8 @@ class SpecSteps(object):
             self._error(exc_stuff)
 
     def _success(self):
-        self.reporter.success(self._current)
+        step = self._current
+        self.reporter.success(step.spec_name, step.step, step.name)
         self._current_index += 1
 
 

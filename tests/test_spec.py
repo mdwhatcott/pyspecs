@@ -1,5 +1,5 @@
 from unittest.case import TestCase, skip
-from mock import Mock
+from mock import Mock, call
 from pyspecs._loader import SpecLoader
 from pyspecs._reporter import Reporter
 from pyspecs._runner import SpecRunner
@@ -16,8 +16,15 @@ class TestFullPassingSpec(TestCase):
 
     def test_result_populated_with_correct_statistics(self):
         self.runner.run_specs()
-        print self.reporter.mock_calls
-        assert False
+        spec_name = 'fully implemented and passing'
+        self.reporter.assert_has_calls([
+            call.success(spec_name, 'given', 'some scenario'),
+            call.success(spec_name, 'when', 'something is invoked'),
+            call.success(spec_name, 'collect', 'results'),
+            call.success(spec_name, 'then', 'something happens'),
+            call.success(spec_name, 'then', 'something is calculated'),
+            call.success(spec_name, 'after', 'cleanup')
+        ])
 
 
 @skip
