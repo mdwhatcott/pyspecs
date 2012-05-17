@@ -30,4 +30,11 @@ class Reporter(object):
 
 
 class DotReporter(Reporter):
-    pass
+    def success(self, step):
+        pass
+
+    def failure(self, step, exc_stuff):
+        pass
+
+    def error(self, step, exc_stuff):
+        pass
