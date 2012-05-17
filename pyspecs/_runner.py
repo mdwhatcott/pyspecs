@@ -12,18 +12,18 @@ class SpecRunner(object):
         self.reporter = reporter
 
     def run_specs(self):
-        for step in chain(self._spec_steps()):
+        for step in chain(*self._spec_steps()):
             step.execute()
 
     def _spec_steps(self):
         for spec in self.loader.load_specs():
-            yield SpecSteps(self.reporter, spec().___collect_steps()) # TODO: initialization error
+            yield SpecSteps(self.reporter, collect_steps(spec()))
 
 
 class SpecSteps(object):
     def __init__(self, reporter, steps):
         self.reporter = reporter
-        self.steps = steps
+        self.steps = list(steps)
         for step in self.steps:
             step.with_callbacks(self._success, self._failure, self._error)
         self._current_index = 0
@@ -59,10 +59,11 @@ class SpecSteps(object):
 
 
 class Step(object):
-    def __init__(self, spec, step, name, action):
+    def __init__(self, spec, step, action):
         self.spec = spec
+        self.spec_name = describe(spec.__class__)
         self.step = step
-        self.name = name
+        self.name = describe(action)
         self._action = action
         self._on_success = None
         self._on_failure = None
@@ -93,15 +94,22 @@ def collect_steps(spec):
         if step is None or step not in steps:
             continue
 
-        spec_name = describe(spec.__class__)
-        description = describe(name)
         if step == THEN_STEP:
-            steps[step].append(Step(spec_name, step, description, method))
+            steps[step].append(Step(spec, step, method))
         else:
-            steps[step] = Step(spec_name, step, description, method)
+            steps[step] = Step(spec, step, method)
 
-    return steps.values()
+    return flatten(steps.values())
 
 
 def describe(obj):
     return obj.__name__.replace('_', ' ')
+
+
+def flatten(l):
+    for x in l:
+        if isinstance(x, list):
+            for y in x:
+                yield y
+        else:
+            yield x
