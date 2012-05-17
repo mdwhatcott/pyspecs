@@ -1,5 +1,5 @@
 from unittest.case import TestCase
-from pyspecs.loader import Importer, _BlankModule
+from pyspecs._loader import Importer, BlankModule
 
 
 class TestImporter(TestCase):
@@ -29,8 +29,8 @@ class TestImporter(TestCase):
 
         self.exception = ImportError
         imported = self.importer.import_module(module_path)
-        self.assertIsInstance(imported, _BlankModule)
+        self.assertIsInstance(imported, BlankModule)
 
         self.exception = NotImplementedError
         imported = self.importer.import_module(module_path)
-        self.assertIsInstance(imported, _BlankModule)
+        self.assertIsInstance(imported, BlankModule)

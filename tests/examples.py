@@ -1,12 +1,10 @@
-from pyspecs.should import this
-from pyspecs.spec import Spec
-from pyspecs.steps import \
-    then, collect, when, after, given, \
-    WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP, GIVEN_STEP
+from pyspecs._steps import \
+    GIVEN_STEP, WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP
+from pyspecs.spec import given, when, collect, then, after, spec, this
 from tests import raise_error
 
 
-class fully_implemented_and_passing(Spec):
+class fully_implemented_and_passing(spec):
     def __init__(self):
         self.executed_steps = []
 
@@ -35,14 +33,14 @@ class fully_implemented_and_passing(Spec):
         self.executed_steps.append('after')
 
 
-class spec_with_failure(Spec):
+class spec_with_failure(spec):
     @then
     def it_should_fail(self):
         print "Hello, World!"
         this(False).should.be(True)
 
 
-class spec_with_assertion_error(Spec):
+class spec_with_assertion_error(spec):
     @then
     def it_should_raise_an_error(self):
         print "Hello, World!"
@@ -57,7 +55,7 @@ class spec_with_assertion_error(Spec):
         print AFTER_STEP,
 
 
-class spec_with_error_before_assertions(Spec):
+class spec_with_error_before_assertions(spec):
     @given
     def an_exception_is_raised(self):
         print GIVEN_STEP
@@ -79,7 +77,7 @@ class spec_with_error_before_assertions(Spec):
     def should_be_executed_to_clean_up(self):
         print AFTER_STEP
 
-class spec_with_error_after_assertions(Spec):
+class spec_with_error_after_assertions(spec):
     @given
     def setup(self):
         print GIVEN_STEP
@@ -106,7 +104,7 @@ class spec_with_error_after_assertions(Spec):
         print AFTER_STEP
 
 
-class spec_with_error_before_and_after_assertions(Spec):
+class spec_with_error_before_and_after_assertions(spec):
     @given
     def setup(self):
         print GIVEN_STEP
@@ -134,7 +132,7 @@ class spec_with_error_before_and_after_assertions(Spec):
         raise_error(ValueError, "Exception from 'after' step.")
 
 
-class spec_without_assertions(Spec):
+class spec_without_assertions(spec):
     def __init__(self):
         self.executed = []
 

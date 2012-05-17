@@ -1,6 +1,6 @@
 from unittest.case import TestCase
-from pyspecs.loader import SpecLoader, Location
-from pyspecs.spec import Spec
+from pyspecs._loader import SpecLoader, Location
+from pyspecs.spec import spec
 
 
 class TestLoadSpecFromSpecModule(TestCase):
@@ -20,7 +20,7 @@ class TestLoadSpecFromSpecModule(TestCase):
         self.assertEqual(TheSpec, specs[0])
 
 
-class TheSpec(Spec): pass
+class TheSpec(spec): pass
 class NotTheSpec(): pass
 
 

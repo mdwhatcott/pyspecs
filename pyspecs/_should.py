@@ -1,40 +1,7 @@
-NO_EXCEPTION = "'{0}' executed successfully but should have raised '{1}'!"
-INCORRECT_EXCEPTION = "Should have raised '{0}' but raised '{1}' instead."
-INCORRECT_EXCEPTION_MESSAGE = "Raised '{0}' as expected but with an " + \
-                              "incorrect error message:\n" + \
-                              "Expected: '{1}'\n" + \
-                              "Received: '{2}'"
-BETWEEN = "to be between '{1}' and '{2}'."
-BE = "to be '{1}'."
-LESS_THAN_EQUAL = "to be less than or equal to '{1}'."
-GREATER_THAN_EQUAL = "to be greater than or equal to '{1}'."
-LESS_THAN = "to be less than '{1}'."
-GREATER_THAN = "to be greater than '{1}'."
-IN = "to be in '{1}'."
-CONTAIN = "to contain '{1}'."
-BE_A = "to be a {1} (was a {2})."
-EQUAL = "to equal '{1}'."
-BE_EMPTY = "to be empty."
-PREPARATION_ERROR = 'You must add calls to .should and .NOT in '\
-    'order execute an assertion!'
-EXPECTED = "Expected '{0}' "
-UNEXPECTED = EXPECTED + "NOT "
-
-
-class ShouldError(AssertionError):
-    def __init__(self, report):
-        AssertionError.__init__(self, report)
-        self.report = report
-        self.traceback = None
-
-    def trace(self, traceback):
-        self.traceback = traceback
-
-    def __str__(self):
-        return self.report
-
-
-class _This(object):
+class This(object):
+    """
+    Should-style assertion class.
+    """
     def __init__(self, value):
         self._value = value
         self._invert = None
@@ -157,9 +124,46 @@ class _This(object):
             raise ShouldError(report())
 
 
-this = _This
+
+class ShouldError(AssertionError):
+    """
+    This framework's version of AssertionError
+    """
+    def __init__(self, report):
+        AssertionError.__init__(self, report)
+        self.report = report
+        self.traceback = None
+
+    def trace(self, traceback):
+        self.traceback = traceback
+
+    def __str__(self):
+        return self.report
 
 
-def expectation(function):
-    setattr(_This, function.__name__, function)
+NO_EXCEPTION = "'{0}' executed successfully but should have raised '{1}'!"
+INCORRECT_EXCEPTION = "Should have raised '{0}' but raised '{1}' instead."
+INCORRECT_EXCEPTION_MESSAGE = "Raised '{0}' as expected but with an " + \
+                              "incorrect error message:\n" + \
+                              "Expected: '{1}'\n" + \
+                              "Received: '{2}'"
+BETWEEN = "to be between '{1}' and '{2}'."
+BE = "to be '{1}'."
+LESS_THAN_EQUAL = "to be less than or equal to '{1}'."
+GREATER_THAN_EQUAL = "to be greater than or equal to '{1}'."
+LESS_THAN = "to be less than '{1}'."
+GREATER_THAN = "to be greater than '{1}'."
+IN = "to be in '{1}'."
+CONTAIN = "to contain '{1}'."
+BE_A = "to be a {1} (was a {2})."
+EQUAL = "to equal '{1}'."
+BE_EMPTY = "to be empty."
+PREPARATION_ERROR = 'You must add calls to .should and .NOT in '\
+    'order execute an assertion!'
+EXPECTED = "Expected '{0}' "
+UNEXPECTED = EXPECTED + "NOT "
+
+
+def should_expectation(function):
+    setattr(This, function.__name__, function)
     return function

@@ -1,5 +1,5 @@
 from unittest.case import TestCase
-from pyspecs.steps import _step, PYSPECS_STEP
+from pyspecs._steps import _step, PYSPECS_STEP
 
 
 class TestStepAsDecorator(TestCase):
