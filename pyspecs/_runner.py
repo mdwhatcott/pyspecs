@@ -10,10 +10,12 @@ class SpecRunner(object):
     def __init__(self, loader, reporter):
         self.loader = loader
         self.reporter = reporter
+        self.captured_stdout = reporter
 
     def run_specs(self):
         for step in chain(*self._spec_steps()):
-            step.execute()
+            with self.captured_stdout:
+                step.execute()
 
     def _spec_steps(self):
         for spec in self.loader.load_specs():
@@ -31,15 +33,16 @@ class SpecSteps(object):
     def __iter__(self):
         return self._iterator()
 
+    def _iterator(self):
+        while self._current is not None:
+            # Redirect stdout
+            yield self._current
+
     @property
     def _current(self):
         return self.steps[self._current_index] \
             if len(self.steps) > self._current_index \
             else None
-
-    def _iterator(self):
-        while self._current is not None:
-            yield self._current
 
     def _error(self, exc_stuff):
         self.reporter.error(self._current, exc_stuff)

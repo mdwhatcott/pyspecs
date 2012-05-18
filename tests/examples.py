@@ -77,6 +77,7 @@ class spec_with_error_before_assertions(spec):
     def should_be_executed_to_clean_up(self):
         print AFTER_STEP
 
+
 class spec_with_error_after_assertions(spec):
     @given
     def setup(self):
@@ -151,3 +152,8 @@ class spec_without_assertions(spec):
     @after
     def cleanup(self):
         self.executed.append(AFTER_STEP)
+
+
+class spec_that_fails_initialization(spec):
+    def __init__(self):
+        raise ValueError("Epic fail.")
