@@ -40,20 +40,25 @@ class TestSpecs(TestCase):
         self.runner.run_specs()
         spec = 'spec with assertion error'
         self.reporter.assert_has_calls([
-                call.error(spec, 'then', 'it should raise an error', ANY),
-                call.success(spec, 'then', 'it should run other assertions'),
-                call.success(spec, 'after', 'cleanup')
+            call.error(spec, 'then', 'it should raise an error', ANY),
+            call.success(spec, 'then', 'it should run other assertions'),
+            call.success(spec, 'after', 'cleanup')
         ])
         # TODO: make assertions about the exception that was reported
 
-    @skip
     def test_spec_with_error_before_assertions(self):
         self.loader.load_specs.return_value = [examples.spec_with_error_before_assertions]
-        #    def test_result_should_convey_the_exception(self): pass
-        #    def test_pre_assertion_steps_should_NOT_be_invoked(self): pass
-        #    def test_assertions_should_NOT_be_invoked(self): pass
-        #    def test_all_output_previous_to_exception_is_captured(self): pass
-        #    def test_cleanup_attempted(self): pass
+        self.runner.run_specs()
+        spec = 'spec with error before assertions'
+        self.reporter.assert_has_calls([
+            call.error(spec, 'given', 'an exception is raised', ANY),
+            call.success(spec, 'after', 'should be executed to clean up')
+        ])
+        self.assertNotIn(call.success(ANY, 'when', ANY), self.reporter.mock_calls)
+        self.assertNotIn(call.success(ANY, 'collect', ANY), self.reporter.mock_calls)
+        self.assertNotIn(call.success(ANY, 'then', ANY), self.reporter.mock_calls)
+        # TODO: make assertions about the exception that was reported
+
 
     @skip
     def test_spec_with_error_after_assertions(self):

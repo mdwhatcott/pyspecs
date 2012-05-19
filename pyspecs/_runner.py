@@ -3,7 +3,7 @@ from inspect import getmembers, ismethod
 from itertools import chain
 from sys import exc_info as get_exception_info
 from pyspecs._should import ShouldError
-from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP
+from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
 
 
 class SpecRunner(object):
@@ -47,7 +47,10 @@ class SpecSteps(object):
     def _error(self, exc_stuff):
         step = self._current
         self.reporter.error(step.spec_name, step.step, step.name, exc_stuff)
-        self._current_index += 1
+        if step.step == THEN_STEP or step.step == AFTER_STEP:
+            self._current_index += 1
+        else:
+            self._current_index = len(self.steps) - 1
 
     def _failure(self, exc_stuff):
         if self._current.step != THEN_STEP:
