@@ -35,11 +35,15 @@ class spec_with_failure(spec):
     def it_should_fail(self):
         this(False).should.be(True)
 
+    @then
+    def it_should_run_other_assertions(self):
+        this(True).should.be(True)
+
 
 class spec_with_assertion_error(spec):
     @then
     def it_should_raise_an_error(self):
-        raise KeyError('Missing key!')
+        raise KeyError
 
     @then
     def it_should_run_other_assertions(self):

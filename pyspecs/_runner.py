@@ -7,13 +7,14 @@ from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP
 
 
 class SpecRunner(object):
-    def __init__(self, loader, reporter):
+    def __init__(self, loader, reporter, captured_stdout):
         self.loader = loader
         self.reporter = reporter
-        self.captured_stdout = reporter
+        self.captured_stdout = captured_stdout
 
     def run_specs(self):
-        for step in chain(*self._spec_steps()):
+        steps = chain(*self._spec_steps())
+        for step in steps:
             with self.captured_stdout:
                 step.execute()
 
@@ -25,7 +26,7 @@ class SpecRunner(object):
 class SpecSteps(object):
     def __init__(self, reporter, steps):
         self.reporter = reporter
-        self.steps = list(steps)
+        self.steps = steps
         for step in self.steps:
             step.with_callbacks(self._success, self._failure, self._error)
         self._current_index = 0
@@ -35,7 +36,6 @@ class SpecSteps(object):
 
     def _iterator(self):
         while self._current is not None:
-            # Redirect stdout
             yield self._current
 
     @property
@@ -45,16 +45,17 @@ class SpecSteps(object):
             else None
 
     def _error(self, exc_stuff):
-        self.reporter.error(self._current, exc_stuff)
-        if self._current.step != THEN_STEP:
-            self._current_index = len(self.steps)
+        step = self._current
+        self.reporter.error(step.spec_name, step.step, step.name, exc_stuff)
+        self._current_index += 1
 
     def _failure(self, exc_stuff):
-        if self._current.step == THEN_STEP:
-            self.reporter.failure(self._current, exc_stuff)
-            self._current_index += 1
-        else:
+        if self._current.step != THEN_STEP:
             self._error(exc_stuff)
+        else:
+            step = self._current
+            self.reporter.failure(step.spec_name, step.name, exc_stuff)
+            self._current_index += 1
 
     def _success(self):
         step = self._current
@@ -78,12 +79,13 @@ class Step(object):
         self._on_failure = failure
         self._on_error = error
 
+    #noinspection PyBroadException
     def execute(self):
         try:
             self._action(self.spec)
         except ShouldError:
             self._on_failure(get_exception_info())
-        except Exception:
+        except:
             self._on_error(get_exception_info())
         else:
             self._on_success()
@@ -103,17 +105,19 @@ def collect_steps(spec):
         else:
             steps[step] = Step(spec, step, method)
 
-    return flatten(steps.values())
+    return list(flatten(steps.values()))
 
 
 def describe(obj):
     return obj.__name__.replace('_', ' ')
 
 
-def flatten(l):
-    for x in l:
-        if isinstance(x, list):
-            for y in x:
-                yield y
+def flatten(list_with_lists):
+    for element in list_with_lists:
+        if isinstance(element, list):
+            for item in element:
+                if item:
+                    yield item
         else:
-            yield x
+            if element:
+                yield element

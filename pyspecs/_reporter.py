@@ -36,11 +36,11 @@ class Reporter(object):
         pass
 
     @abstractmethod
-    def failure(self, step, exc_stuff):
+    def failure(self, spec_name, step_name, exc_stuff):
         pass
 
     @abstractmethod
-    def error(self, step, exc_stuff):
+    def error(self, spec_name, step, step_name, exc_stuff):
         pass
 
 
@@ -51,8 +51,8 @@ class DotReporter(Reporter):
     def success(self, spec_name, step, step_name):
         pass
 
-    def failure(self, step, exc_stuff):
+    def failure(self, spec_name, step_name, exc_stuff):
         pass
 
-    def error(self, step, exc_stuff):
+    def error(self, spec_name, step, step_name, exc_stuff):
         pass
