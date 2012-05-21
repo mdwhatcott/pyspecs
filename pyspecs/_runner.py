@@ -1,6 +1,5 @@
 from collections import OrderedDict
-from inspect import getmembers, ismethod
-import inspect
+from inspect import getmembers, ismethod, isclass, isfunction
 from sys import exc_info
 from pyspecs._should import ShouldError
 from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
@@ -8,13 +7,13 @@ from pyspecs.spec import spec
 
 
 def run_specs(loader, reporter, captured_stdout):
-    for spec in flatten_specs_into_steps(loader, reporter):
+    for spec in load_specs(loader, reporter):
         for step in spec:
             with captured_stdout:
                 step.execute()
 
 
-def flatten_specs_into_steps(loader, reporter):
+def load_specs(loader, reporter):
     for spec in loader.load_specs():
         yield SpecSteps(reporter, collect_steps(spec))
 
@@ -49,6 +48,13 @@ def scan_for_steps(spec):
 
 
 def flatten(list_with_lists):
+    """
+    Turns a list with lists as elements into a flat list.
+
+    flatten([1, 2, 3, [4, 5], 6]) == [1, 2, 3, 4, 5, 6]
+
+    (Not recursive)
+    """
     for element in list_with_lists:
         if isinstance(element, list):
             for item in element:
@@ -137,18 +143,23 @@ class Step(object):
 
 
 def describe(obj):
+    """
+    Turns an object into a space-delimited description.
+
+    describe(obj_with_underscores_in_name) == 'obj with underscores in name'
+    """
     original = str(obj)
 
     if isinstance(obj, basestring):
         original = obj
 
-    elif inspect.ismethod(obj):
+    elif ismethod(obj):
         original = obj.__name__
 
-    elif inspect.isclass(obj):
+    elif isclass(obj):
         original = obj.__name__
 
-    elif inspect.isfunction(obj):
+    elif isfunction(obj):
         original = obj.func_name
 
     elif isinstance(obj, spec):
@@ -157,16 +168,13 @@ def describe(obj):
     return original.replace('_' , ' ')
 
 
-SPEC_NOT_IMPLEMENTED = 'No assertions ("@then" decorators) found ' \
-                       'with the current spec.'
-SPEC_INITIALIZATION_ERROR = 'The spec could not be initialized ' \
-                            '(error in constructor).'
-
-#noinspection PyUnusedLocal
+#noinspection PyUnusedLocal # pycharm inspection suppression
 def initialization_error(self):
-    raise NotImplementedError(SPEC_INITIALIZATION_ERROR)
+    message = 'The spec ({0}) could not be initialized (error in constructor).'
+    raise NotImplementedError(message.format(describe(self)))
 
 
-#noinspection PyUnusedLocal
+#noinspection PyUnusedLocal # pycharm inspection suppression
 def not_implemented(self):
-    raise NotImplementedError(SPEC_NOT_IMPLEMENTED)
+    message = 'No assertions ("@then" decorators) found with the spec ({0}).'
+    raise NotImplementedError(message.format(describe(self)))
