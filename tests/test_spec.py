@@ -1,4 +1,4 @@
-from unittest.case import TestCase, skip
+from unittest.case import TestCase
 from mock import Mock, call, ANY, MagicMock
 from pyspecs._runner import SpecRunner
 from tests import examples
@@ -12,7 +12,8 @@ class TestSpecs(TestCase):
         self.runner = SpecRunner(self.loader, self.reporter, self.capture)
 
     def test_full_passing(self):
-        self.loader.load_specs.return_value = [examples.fully_implemented_and_passing]
+        self.loader.load_specs.return_value = \
+            [examples.fully_implemented_and_passing]
         self.runner.run_specs()
         subject = 'fully implemented and passing'
         self.reporter.assert_has_calls([
@@ -36,7 +37,8 @@ class TestSpecs(TestCase):
         # TODO: make assertions about the exception that was reported
 
     def test_spec_with_assertion_error(self):
-        self.loader.load_specs.return_value = [examples.spec_with_assertion_error]
+        self.loader.load_specs.return_value = \
+            [examples.spec_with_assertion_error]
         self.runner.run_specs()
         spec = 'spec with assertion error'
         self.reporter.assert_has_calls([
@@ -47,40 +49,88 @@ class TestSpecs(TestCase):
         # TODO: make assertions about the exception that was reported
 
     def test_spec_with_error_before_assertions(self):
-        self.loader.load_specs.return_value = [examples.spec_with_error_before_assertions]
+        self.loader.load_specs.return_value = \
+            [examples.spec_with_error_before_assertions]
         self.runner.run_specs()
         spec = 'spec with error before assertions'
         self.reporter.assert_has_calls([
             call.error(spec, 'given', 'an exception is raised', ANY),
             call.success(spec, 'after', 'should be executed to clean up')
         ])
-        self.assertNotIn(call.success(ANY, 'when', ANY), self.reporter.mock_calls)
-        self.assertNotIn(call.success(ANY, 'collect', ANY), self.reporter.mock_calls)
-        self.assertNotIn(call.success(ANY, 'then', ANY), self.reporter.mock_calls)
+        calls = self.reporter.mock_calls
+        self.assertNotIn(call.success(ANY, 'when', ANY), calls)
+        self.assertNotIn(call.success(ANY, 'collect', ANY), calls)
+        self.assertNotIn(call.success(ANY, 'then', ANY), calls)
         # TODO: make assertions about the exception that was reported
 
+    def test_spec_with_error_before_assertions_with_no_cleanup(self):
+        self.loader.load_specs.return_value = \
+            [examples.spec_with_error_before_assertions_without_cleanup]
+        self.runner.run_specs()
+        spec = 'spec with error before assertions without cleanup'
+        self.assertSequenceEqual(self.reporter.mock_calls, [
+            call.error(spec, 'when', 'an exception is raised', ANY),
+        ])
 
-    @skip
+
     def test_spec_with_error_after_assertions(self):
-        self.loader.load_specs.return_value = [examples.spec_with_error_after_assertions]
-        #    def test_result_should_convey_the_exception(self): pass
-        #    def test_all_output_previous_to_exception_is_captured(self): pass
+        self.loader.load_specs.return_value = \
+            [examples.spec_with_error_after_assertions]
+        self.runner.run_specs()
+        spec = 'spec with error after assertions'
+        self.reporter.assert_has_calls([
+            call.success(spec, 'given', 'setup'),
+            call.success(spec, 'when', 'action'),
+            call.success(spec, 'collect', 'result'),
+            call.success(spec, 'then', 'something'),
+            call.success(spec, 'then', 'something else'),
+            call.error(spec, 'after', 'an exception is raised', ANY)
+        ])
+        # TODO: make assertions about the exception that was reported
 
-    @skip
     def test_spec_with_errors_before_and_after_assertions(self):
-        self.loader.load_specs.return_value = [examples.spec_with_error_before_and_after_assertions]
-        #    def test_result_should_convey_pre_assertion_error(self): pass
-        #    def test_result_should_convey_post_assertion_error(self): pass
-        #    def test_all_output_previous_to_first_exception_is_captured(self): pass
-        #    def test_no_assertions_attempted(self): pass
-        #    def test_all_output_previous_to_second_exception_is_captured(self): pass
+        self.loader.load_specs.return_value = \
+            [examples.spec_with_error_before_and_after_assertions]
+        self.runner.run_specs()
+        spec = 'spec with error before and after assertions'
+        self.reporter.assert_has_calls([
+            call.success(spec, 'given', 'setup'),
+            call.success(spec, 'when', 'action'),
+            call.error(spec, 'collect', 'result', ANY),
+            call.error(spec, 'after', 'an exception is raised', ANY)
+        ])
+        # TODO: make assertions about the exceptions that were reported
 
-    @skip
     def test_spec_with_no_assertions(self):
-        self.loader.load_specs.return_value = [examples.spec_without_assertions]
-        #    def test_no_steps_should_be_executed(self): pass
-        #    def test_result_should_indicate_that_the_spec_is_not_implemented(self): pass
+        self.loader.load_specs.return_value = \
+            [examples.spec_without_assertions]
+        self.runner.run_specs()
+        self.assertEqual(
+            self.reporter.mock_calls[0],
+            call.error(
+                'spec without assertions',
+                'collect steps',
+                'not implemented',
+                ANY)
+        )
 
-    @skip
+        # TODO: exception should indicate that the spec is not implemented
+
     def test_spec_that_fails_initialization(self):
-        self.loader.load_specs.return_value = [examples.spec_that_fails_initialization]
+        self.loader.load_specs.return_value = \
+            [examples.spec_that_fails_initialization]
+        self.runner.run_specs()
+        self.reporter.assert_has_calls([
+            call.error('spec that fails initialization', ANY, ANY, ANY)
+        ])
+
+        # TODO: exception should indicate that spec steps were not applied correctly.
+
+    def test_improper_use_of_spec_step_methods(self):
+        pass
+        # more than one given, when, collect, or after step
+
+    def test_inheritance_of_steps(self):
+        pass
+        # base class defines given, when, collect, and after
+        # child class makes assertions

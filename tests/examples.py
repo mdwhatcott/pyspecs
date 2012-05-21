@@ -76,6 +76,17 @@ class spec_with_error_before_assertions(spec):
         pass
 
 
+class spec_with_error_before_assertions_without_cleanup(spec):
+    @when
+    def an_exception_is_raised(self):
+        raise KeyError
+
+    @then
+    def this_should_NOT_execute(self):
+        pass
+
+
+
 class spec_with_error_after_assertions(spec):
     @given
     def setup(self):

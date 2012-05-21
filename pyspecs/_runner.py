@@ -1,9 +1,16 @@
 from collections import OrderedDict
 from inspect import getmembers, ismethod
-from itertools import chain
-from sys import exc_info as get_exception_info
+import inspect
+from sys import exc_info
 from pyspecs._should import ShouldError
 from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
+from pyspecs.spec import spec
+
+
+SPEC_NOT_IMPLEMENTED = 'No assertions ("@then" decorators) found ' \
+                       'with the current spec.'
+SPEC_INITIALIZATION_ERROR = 'The spec could not be initialized ' \
+                            '(error in constructor).'
 
 
 class SpecRunner(object):
@@ -13,14 +20,14 @@ class SpecRunner(object):
         self.captured_stdout = captured_stdout
 
     def run_specs(self):
-        steps = chain(*self._spec_steps())
-        for step in steps:
-            with self.captured_stdout:
-                step.execute()
+        for spec in self._spec_steps():
+            for step in spec:
+                with self.captured_stdout:
+                    step.execute()
 
     def _spec_steps(self):
         for spec in self.loader.load_specs():
-            yield SpecSteps(self.reporter, collect_steps(spec()))
+            yield SpecSteps(self.reporter, collect_steps(spec))
 
 
 class SpecSteps(object):
@@ -44,13 +51,20 @@ class SpecSteps(object):
             if len(self.steps) > self._current_index \
             else None
 
+    def _next(self):
+        self._current_index += 1
+
     def _error(self, exc_stuff):
         step = self._current
         self.reporter.error(step.spec_name, step.step, step.name, exc_stuff)
-        if step.step == THEN_STEP or step.step == AFTER_STEP:
-            self._current_index += 1
+        if step.step in [THEN_STEP, AFTER_STEP] or step.step not in ALL_STEPS:
+            self._next()
         else:
-            self._current_index = len(self.steps) - 1
+            self._advance_to_cleanup()
+
+    def _advance_to_cleanup(self):
+        cleanup_offset = 1 if self.steps[-1].step == AFTER_STEP else 0
+        self._current_index = len(self.steps) - cleanup_offset
 
     def _failure(self, exc_stuff):
         if self._current.step != THEN_STEP:
@@ -58,18 +72,18 @@ class SpecSteps(object):
         else:
             step = self._current
             self.reporter.failure(step.spec_name, step.name, exc_stuff)
-            self._current_index += 1
+            self._next()
 
     def _success(self):
         step = self._current
         self.reporter.success(step.spec_name, step.step, step.name)
-        self._current_index += 1
+        self._next()
 
 
 class Step(object):
     def __init__(self, spec, step, action):
         self.spec = spec
-        self.spec_name = describe(spec.__class__)
+        self.spec_name = describe(spec)
         self.step = step
         self.name = describe(action)
         self._action = action
@@ -82,37 +96,75 @@ class Step(object):
         self._on_failure = failure
         self._on_error = error
 
-    #noinspection PyBroadException
     def execute(self):
         try:
             self._action(self.spec)
         except ShouldError:
-            self._on_failure(get_exception_info())
-        except:
-            self._on_error(get_exception_info())
+            self._on_failure(exc_info())
+        except Exception:
+            self._on_error(exc_info())
         else:
             self._on_success()
 
 
+def describe(obj):
+    original = str(obj)
+
+    if isinstance(obj, basestring):
+        original = obj
+
+    elif inspect.ismethod(obj):
+        original = obj.__name__
+
+    elif inspect.isclass(obj):
+        original = obj.__name__
+
+    elif inspect.isfunction(obj):
+        original = obj.func_name
+
+    elif isinstance(obj, spec):
+        original = obj.__class__.__name__
+
+    return original.replace('_' , ' ')
+
+
 def collect_steps(spec):
+    try:
+        spec = spec()
+    except Exception:
+        return [Step(
+            describe(spec), describe(collect_steps), initialization_error)]
+
+    steps = _scan_for_steps(spec)
+
+    if not steps[THEN_STEP]:
+        return [Step(spec, describe(collect_steps), not_implemented)]
+
+    return list(flatten(steps.values()))
+
+
+def _scan_for_steps(spec):
     steps = OrderedDict.fromkeys(ALL_STEPS)
     steps[THEN_STEP] = list()
 
     for name, method in getmembers(spec.__class__, ismethod):
         step = getattr(method, PYSPECS_STEP, None)
-        if step is None or step not in steps:
-            continue
-
         if step == THEN_STEP:
             steps[step].append(Step(spec, step, method))
         else:
             steps[step] = Step(spec, step, method)
 
-    return list(flatten(steps.values()))
+    return steps
 
 
-def describe(obj):
-    return obj.__name__.replace('_', ' ')
+#noinspection PyUnusedLocal
+def initialization_error(self):
+    raise NotImplementedError(SPEC_INITIALIZATION_ERROR)
+
+
+#noinspection PyUnusedLocal
+def not_implemented(self):
+    raise NotImplementedError(SPEC_NOT_IMPLEMENTED)
 
 
 def flatten(list_with_lists):
