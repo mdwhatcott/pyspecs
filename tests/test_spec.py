@@ -1,6 +1,6 @@
 from unittest.case import TestCase
 from mock import Mock, call, ANY, MagicMock
-from pyspecs._runner import SpecRunner
+from pyspecs import _runner as runner
 from tests import examples
 
 
@@ -9,12 +9,11 @@ class TestSpecs(TestCase):
         self.reporter = Mock()
         self.capture = MagicMock()
         self.loader = Mock()
-        self.runner = SpecRunner(self.loader, self.reporter, self.capture)
 
     def test_full_passing(self):
         self.loader.load_specs.return_value = \
             [examples.fully_implemented_and_passing]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         subject = 'fully implemented and passing'
         self.reporter.assert_has_calls([
             call.success(subject, 'given', 'some scenario'),
@@ -27,7 +26,7 @@ class TestSpecs(TestCase):
 
     def test_spec_with_assertion_failure(self):
         self.loader.load_specs.return_value = [examples.spec_with_failure]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         spec = 'spec with failure'
         self.reporter.assert_has_calls([
                 call.failure(spec, 'it should fail', ANY),
@@ -39,7 +38,7 @@ class TestSpecs(TestCase):
     def test_spec_with_assertion_error(self):
         self.loader.load_specs.return_value = \
             [examples.spec_with_assertion_error]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         spec = 'spec with assertion error'
         self.reporter.assert_has_calls([
             call.error(spec, 'then', 'it should raise an error', ANY),
@@ -51,7 +50,7 @@ class TestSpecs(TestCase):
     def test_spec_with_error_before_assertions(self):
         self.loader.load_specs.return_value = \
             [examples.spec_with_error_before_assertions]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         spec = 'spec with error before assertions'
         self.reporter.assert_has_calls([
             call.error(spec, 'given', 'an exception is raised', ANY),
@@ -66,7 +65,7 @@ class TestSpecs(TestCase):
     def test_spec_with_error_before_assertions_with_no_cleanup(self):
         self.loader.load_specs.return_value = \
             [examples.spec_with_error_before_assertions_without_cleanup]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         spec = 'spec with error before assertions without cleanup'
         self.assertSequenceEqual(self.reporter.mock_calls, [
             call.error(spec, 'when', 'an exception is raised', ANY),
@@ -76,7 +75,7 @@ class TestSpecs(TestCase):
     def test_spec_with_error_after_assertions(self):
         self.loader.load_specs.return_value = \
             [examples.spec_with_error_after_assertions]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         spec = 'spec with error after assertions'
         self.reporter.assert_has_calls([
             call.success(spec, 'given', 'setup'),
@@ -91,7 +90,7 @@ class TestSpecs(TestCase):
     def test_spec_with_errors_before_and_after_assertions(self):
         self.loader.load_specs.return_value = \
             [examples.spec_with_error_before_and_after_assertions]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         spec = 'spec with error before and after assertions'
         self.reporter.assert_has_calls([
             call.success(spec, 'given', 'setup'),
@@ -104,7 +103,7 @@ class TestSpecs(TestCase):
     def test_spec_with_no_assertions(self):
         self.loader.load_specs.return_value = \
             [examples.spec_without_assertions]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         self.assertEqual(
             self.reporter.mock_calls[0],
             call.error(
@@ -119,7 +118,7 @@ class TestSpecs(TestCase):
     def test_spec_that_fails_initialization(self):
         self.loader.load_specs.return_value = \
             [examples.spec_that_fails_initialization]
-        self.runner.run_specs()
+        runner.run_specs(self.loader, self.reporter, self.capture)
         self.reporter.assert_has_calls([
             call.error('spec that fails initialization', ANY, ANY, ANY)
         ])

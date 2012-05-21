@@ -7,27 +7,56 @@ from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
 from pyspecs.spec import spec
 
 
-SPEC_NOT_IMPLEMENTED = 'No assertions ("@then" decorators) found ' \
-                       'with the current spec.'
-SPEC_INITIALIZATION_ERROR = 'The spec could not be initialized ' \
-                            '(error in constructor).'
+def run_specs(loader, reporter, captured_stdout):
+    for spec in flatten_specs_into_steps(loader, reporter):
+        for step in spec:
+            with captured_stdout:
+                step.execute()
 
 
-class SpecRunner(object):
-    def __init__(self, loader, reporter, captured_stdout):
-        self.loader = loader
-        self.reporter = reporter
-        self.captured_stdout = captured_stdout
+def flatten_specs_into_steps(loader, reporter):
+    for spec in loader.load_specs():
+        yield SpecSteps(reporter, collect_steps(spec))
 
-    def run_specs(self):
-        for spec in self._spec_steps():
-            for step in spec:
-                with self.captured_stdout:
-                    step.execute()
 
-    def _spec_steps(self):
-        for spec in self.loader.load_specs():
-            yield SpecSteps(self.reporter, collect_steps(spec))
+def collect_steps(spec):
+    try:
+        spec = spec()
+    except Exception:
+        return [Step(
+            describe(spec), describe(collect_steps), initialization_error)]
+
+    steps = scan_for_steps(spec)
+
+    if not steps[THEN_STEP]:
+        return [Step(spec, describe(collect_steps), not_implemented)]
+
+    return list(flatten(steps.values()))
+
+
+def scan_for_steps(spec):
+    steps = OrderedDict.fromkeys(ALL_STEPS)
+    steps[THEN_STEP] = list()
+
+    for name, method in getmembers(spec.__class__, ismethod):
+        step = getattr(method, PYSPECS_STEP, None)
+        if step == THEN_STEP:
+            steps[step].append(Step(spec, step, method))
+        else:
+            steps[step] = Step(spec, step, method)
+
+    return steps
+
+
+def flatten(list_with_lists):
+    for element in list_with_lists:
+        if isinstance(element, list):
+            for item in element:
+                if item:
+                    yield item
+        else:
+            if element:
+                yield element
 
 
 class SpecSteps(object):
@@ -128,34 +157,10 @@ def describe(obj):
     return original.replace('_' , ' ')
 
 
-def collect_steps(spec):
-    try:
-        spec = spec()
-    except Exception:
-        return [Step(
-            describe(spec), describe(collect_steps), initialization_error)]
-
-    steps = _scan_for_steps(spec)
-
-    if not steps[THEN_STEP]:
-        return [Step(spec, describe(collect_steps), not_implemented)]
-
-    return list(flatten(steps.values()))
-
-
-def _scan_for_steps(spec):
-    steps = OrderedDict.fromkeys(ALL_STEPS)
-    steps[THEN_STEP] = list()
-
-    for name, method in getmembers(spec.__class__, ismethod):
-        step = getattr(method, PYSPECS_STEP, None)
-        if step == THEN_STEP:
-            steps[step].append(Step(spec, step, method))
-        else:
-            steps[step] = Step(spec, step, method)
-
-    return steps
-
+SPEC_NOT_IMPLEMENTED = 'No assertions ("@then" decorators) found ' \
+                       'with the current spec.'
+SPEC_INITIALIZATION_ERROR = 'The spec could not be initialized ' \
+                            '(error in constructor).'
 
 #noinspection PyUnusedLocal
 def initialization_error(self):
@@ -165,14 +170,3 @@ def initialization_error(self):
 #noinspection PyUnusedLocal
 def not_implemented(self):
     raise NotImplementedError(SPEC_NOT_IMPLEMENTED)
-
-
-def flatten(list_with_lists):
-    for element in list_with_lists:
-        if isinstance(element, list):
-            for item in element:
-                if item:
-                    yield item
-        else:
-            if element:
-                yield element
