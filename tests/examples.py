@@ -216,3 +216,30 @@ class spec_with_multiple_afters(spec):
     @after
     def second(self):
         pass
+
+class using_a_parent(object):
+    @given
+    def setup(self):
+        pass
+
+    @when
+    def action(self):
+        pass
+
+    @collect
+    def results(self):
+        pass
+
+    @after
+    def cleanup(self):
+        pass
+
+
+class child(spec, using_a_parent):
+    @then
+    def something(self):
+        pass
+
+    @then
+    def something_else(self):
+        pass

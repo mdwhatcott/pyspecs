@@ -187,6 +187,10 @@ def describe(obj):
 
     elif isinstance(obj, spec):
         original = obj.__class__.__name__
+        bases = [b for b in obj.__class__.mro()
+                 if b not in [obj.__class__, spec, object]]
+        for base in bases:
+            original += ', {0}'.format(describe(base.__name__))
 
     return original.replace('_' , ' ')
 

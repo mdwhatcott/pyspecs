@@ -172,6 +172,15 @@ class TestSpecs(TestCase):
             expected_messages, [e.message for e in exceptions])
 
     def test_inheritance_of_steps(self):
-        pass
-        # base class defines given, when, collect, and after
-        # child class makes assertions
+        self.run_spec(
+            [examples.child],
+            'child spec, using a base spec'
+        )
+        self.mock.assert_has_calls([
+            call.success(self.spec, 'given', 'setup'),
+            call.success(self.spec, 'when', 'action'),
+            call.success(self.spec, 'collect', 'results'),
+            call.success(self.spec, 'then', 'something'),
+            call.success(self.spec, 'then', 'something else'),
+            call.success(self.spec, 'after', 'cleanup')
+        ])
