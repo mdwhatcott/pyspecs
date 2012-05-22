@@ -1,155 +1,245 @@
-from pyspecs.should import this
-from pyspecs.spec import Spec
-from pyspecs.steps import \
-    then, collect, when, after, given, \
-    WHEN_STEP, COLLECT_STEP, THEN_STEP, AFTER_STEP, GIVEN_STEP
-from tests import raise_error
+from pyspecs import given, when, collect, then, after, spec, this
 
 
-class fully_implemented_and_passing(Spec):
+class fully_implemented_and_passing(spec):
     def __init__(self):
-        self.executed_steps = []
+        pass
 
     @given
     def some_scenario(self):
-        self.executed_steps.append('given')
+        pass
 
     @when
     def something_is_invoked(self):
-        self.executed_steps.append('when')
+        pass
 
     @collect
     def results(self):
-        self.executed_steps.append('collect')
+        pass
 
     @then
     def something_happens(self):
-        self.executed_steps.append('then1')
+        pass
 
     @then
     def something_is_calculated(self):
-        self.executed_steps.append('then2')
+        pass
 
     @after
     def cleanup(self):
-        self.executed_steps.append('after')
+        pass
 
 
-class spec_with_failure(Spec):
+class spec_with_failure(spec):
     @then
     def it_should_fail(self):
-        print "Hello, World!"
         this(False).should.be(True)
-
-
-class spec_with_assertion_error(Spec):
-    @then
-    def it_should_raise_an_error(self):
-        print "Hello, World!"
-        raise KeyError('Missing key!')
 
     @then
     def it_should_run_other_assertions(self):
-        self.other_assertion = True
+        this(True).should.be(True)
+
+
+class spec_with_assertion_error(spec):
+    @then
+    def it_should_raise_an_error(self):
+        raise KeyError
+
+    @then
+    def it_should_run_other_assertions(self):
+        pass
 
     @after
     def cleanup(self):
-        print AFTER_STEP,
+        pass
 
 
-class spec_with_error_before_assertions(Spec):
+class spec_with_error_before_assertions(spec):
     @given
     def an_exception_is_raised(self):
-        print GIVEN_STEP
-        raise_error(KeyError, 'Exception in "given"')
+        raise KeyError
 
     @when
     def this_should_NOT_execute(self):
-        print WHEN_STEP
+        pass
 
     @collect
     def this_should_NOT_execute_either(self):
-        print COLLECT_STEP
+        pass
 
     @then
     def should_NOT_be_executed(self):
-        print THEN_STEP
+        pass
 
     @after
     def should_be_executed_to_clean_up(self):
-        print AFTER_STEP
+        pass
 
-class spec_with_error_after_assertions(Spec):
+
+class spec_with_error_before_assertions_without_cleanup(spec):
+    @when
+    def an_exception_is_raised(self):
+        raise KeyError
+
+    @then
+    def this_should_NOT_execute(self):
+        pass
+
+
+
+class spec_with_error_after_assertions(spec):
     @given
     def setup(self):
-        print GIVEN_STEP
+        pass
 
     @when
     def action(self):
-        print WHEN_STEP
+        pass
 
     @collect
     def result(self):
-        print COLLECT_STEP
+        pass
 
     @then
     def something(self):
-        print THEN_STEP
+        pass
 
     @then
     def something_else(self):
-        print THEN_STEP
+        pass
 
     @after
     def an_exception_is_raised(self):
-        raise_error(KeyError, "Exception from 'after' step.")
-        print AFTER_STEP
+        raise KeyError
 
 
-class spec_with_error_before_and_after_assertions(Spec):
+class spec_with_error_before_and_after_assertions(spec):
     @given
     def setup(self):
-        print GIVEN_STEP
+        pass
 
     @when
     def action(self):
-        print WHEN_STEP
+        pass
 
     @collect
     def result(self):
-        print COLLECT_STEP
-        raise_error(KeyError, "Exception from 'collect' step.")
+        raise KeyError
 
     @then
     def something(self):
-        print THEN_STEP
+        pass
 
     @then
     def something_else(self):
-        print THEN_STEP
+        pass
 
     @after
     def an_exception_is_raised(self):
-        print AFTER_STEP
-        raise_error(ValueError, "Exception from 'after' step.")
+        raise ValueError
 
 
-class spec_without_assertions(Spec):
-    def __init__(self):
-        self.executed = []
-
+class spec_without_assertions(spec):
     @given
     def setup(self):
-        self.executed.append(GIVEN_STEP)
+        pass
 
     @when
     def action(self):
-        self.executed.append(WHEN_STEP)
+        pass
 
     @collect
     def result(self):
-        self.executed.append(COLLECT_STEP)
+        pass
 
     @after
     def cleanup(self):
-        self.executed.append(AFTER_STEP)
+        pass
+
+
+class spec_that_fails_initialization(spec):
+    def __init__(self):
+        raise ValueError
+
+
+class spec_with_multiple_givens(spec):
+    @given
+    def first(self):
+        pass
+
+    @given
+    def second(self):
+        pass
+
+    @then
+    def something(self):
+        pass
+
+
+class spec_with_multiple_whens(spec):
+    @when
+    def first(self):
+        pass
+
+    @when
+    def second(self):
+        pass
+
+    @then
+    def something(self):
+        pass
+
+
+class spec_with_multiple_collects(spec):
+    @collect
+    def first(self):
+        pass
+
+    @collect
+    def second(self):
+        pass
+
+    @then
+    def something(self):
+        pass
+
+
+class spec_with_multiple_afters(spec):
+    @then
+    def something(self):
+        pass
+
+    @after
+    def first(self):
+        pass
+
+    @after
+    def second(self):
+        pass
+
+class using_a_parent(object):
+    @given
+    def setup(self):
+        pass
+
+    @when
+    def action(self):
+        pass
+
+    @collect
+    def results(self):
+        pass
+
+    @after
+    def cleanup(self):
+        pass
+
+
+class child(spec, using_a_parent):
+    @then
+    def something(self):
+        pass
+
+    @then
+    def something_else(self):
+        pass

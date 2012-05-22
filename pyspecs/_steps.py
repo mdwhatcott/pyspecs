@@ -20,10 +20,3 @@ def _step(name):
         setattr(object, PYSPECS_STEP, name)
         return object
     return decorator
-
-
-given = _step(GIVEN_STEP)
-when = _step(WHEN_STEP)
-collect = _step(COLLECT_STEP)
-then = _step(THEN_STEP)
-after = _step(AFTER_STEP)

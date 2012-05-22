@@ -1,6 +1,6 @@
 from unittest.case import TestCase
-from pyspecs.should import this, expectation, ShouldError, PREPARATION_ERROR
-
+from pyspecs._should import PREPARATION_ERROR, ShouldError, should_expectation
+from pyspecs.spec import this
 
 class TestShouldAssertions(TestCase):
     def setUp(self):
@@ -165,7 +165,7 @@ class TestShouldAssertions(TestCase):
                 action=lambda: this._value == 5,
                 report=lambda: "'{0}' should equal '5'.".format(this._value)
             )
-        expectation(be_5)
+        should_expectation(be_5)
         self._passes(lambda: this(5).should.be_5())
         self._fails(lambda: this(4).should.be_5(), "'4' should equal '5'.")
 

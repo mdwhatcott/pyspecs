@@ -2,7 +2,7 @@ import importlib
 import inspect
 import os
 from os.path import commonprefix
-from pyspecs.spec import Spec
+from pyspecs.spec import spec
 
 
 class SpecLoader(object):
@@ -21,7 +21,7 @@ class SpecLoader(object):
         contents = vars(module)
         inspect.getmembers(module, inspect.isclass)
         for value in contents.itervalues():
-            if inspect.isclass(value) and issubclass(value, Spec):
+            if inspect.isclass(value) and issubclass(value, spec):
                 yield value
 
 
@@ -46,10 +46,10 @@ class Importer(object):
         try:
             return self.import_tool(module_name)
         except (ImportError, NotImplementedError):
-            return _BlankModule()
+            return BlankModule()
 
 
-class _BlankModule(object):
+class BlankModule(object):
     def __init__(self):
         self.__dir__ = list()
 
