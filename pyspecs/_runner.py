@@ -22,29 +22,52 @@ def collect_steps(spec):
     try:
         spec = spec()
     except Exception:
-        return [Step(
-            describe(spec), describe(collect_steps), initialization_error)]
+        return constructor_error_steps(spec)
 
     steps = scan_for_steps(spec)
 
     if not steps[THEN_STEP]:
-        return [Step(spec, describe(collect_steps), not_implemented)]
+        return no_assertions_steps(spec)
+
+    extra_steps = [s for s in steps if s != THEN_STEP and len(steps[s]) > 1]
+    if any(extra_steps):
+        return extra_steps_steps(spec, extra_steps)
 
     return list(flatten(steps.values()))
 
 
+def constructor_error_steps(spec):
+    def initialization_error(spec):
+        raise SpecInitializationError.constructor_error(spec)
+
+    return [Step(describe(spec), describe(collect_steps), initialization_error)]
+
+
 def scan_for_steps(spec):
     steps = OrderedDict.fromkeys(ALL_STEPS)
-    steps[THEN_STEP] = list()
+    for step in steps:
+        steps[step] = list()
 
     for name, method in getmembers(spec.__class__, ismethod):
         step = getattr(method, PYSPECS_STEP, None)
-        if step == THEN_STEP:
+        if step in steps:
             steps[step].append(Step(spec, step, method))
-        else:
-            steps[step] = Step(spec, step, method)
 
     return steps
+
+
+def no_assertions_steps(spec):
+    def not_implemented(spec):
+        raise SpecInitializationError.no_assertions(spec)
+
+    return [Step(spec, describe(collect_steps), not_implemented)]
+
+
+def extra_steps_steps(spec, extra):
+    def extra_steps(spec):
+        raise SpecInitializationError.extra_steps(spec, extra)
+
+    return [Step(spec, describe(collect_steps), extra_steps)]
 
 
 def flatten(list_with_lists):
@@ -168,13 +191,25 @@ def describe(obj):
     return original.replace('_' , ' ')
 
 
-#noinspection PyUnusedLocal # pycharm inspection suppression
-def initialization_error(self):
-    message = 'The spec ({0}) could not be initialized (error in constructor).'
-    raise NotImplementedError(message.format(describe(self)))
+class SpecInitializationError(Exception):
+    def __init__(self, message, *args, **kwargs):
+        super(SpecInitializationError, self).__init__(*args, **kwargs)
+        self.message = message
 
+    @classmethod
+    def constructor_error(cls, spec):
+        message = 'The spec ({0}) could not be ' \
+                  'initialized (error in constructor).'.format(describe(spec))
+        return SpecInitializationError(message)
 
-#noinspection PyUnusedLocal # pycharm inspection suppression
-def not_implemented(self):
-    message = 'No assertions ("@then" decorators) found with the spec ({0}).'
-    raise NotImplementedError(message.format(describe(self)))
+    @classmethod
+    def no_assertions(cls, spec):
+        message = 'No assertions ("@then" decorators) ' \
+                  'found with the spec ({0}).'.format(describe(spec))
+        return SpecInitializationError(message)
+
+    @classmethod
+    def extra_steps(cls, spec, extra):
+        message = 'The spec ({0}) has extra steps ({1}).'\
+            .format(describe(spec), extra)
+        return SpecInitializationError(message)

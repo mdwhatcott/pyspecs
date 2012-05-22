@@ -160,3 +160,59 @@ class spec_without_assertions(spec):
 class spec_that_fails_initialization(spec):
     def __init__(self):
         raise ValueError
+
+
+class spec_with_multiple_givens(spec):
+    @given
+    def first(self):
+        pass
+
+    @given
+    def second(self):
+        pass
+
+    @then
+    def something(self):
+        pass
+
+
+class spec_with_multiple_whens(spec):
+    @when
+    def first(self):
+        pass
+
+    @when
+    def second(self):
+        pass
+
+    @then
+    def something(self):
+        pass
+
+
+class spec_with_multiple_collects(spec):
+    @collect
+    def first(self):
+        pass
+
+    @collect
+    def second(self):
+        pass
+
+    @then
+    def something(self):
+        pass
+
+
+class spec_with_multiple_afters(spec):
+    @then
+    def something(self):
+        pass
+
+    @after
+    def first(self):
+        pass
+
+    @after
+    def second(self):
+        pass
