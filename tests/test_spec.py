@@ -10,118 +10,117 @@ class TestSpecs(TestCase):
         self.capture = MagicMock()
         self.loader = Mock()
 
-    def test_full_passing(self):
-        self.loader.load_specs.return_value = \
-            [examples.fully_implemented_and_passing]
+    def run_spec(self, spec, spec_description):
+        self.loader.load_specs.return_value = [spec]
         runner.run_specs(self.loader, self.reporter, self.capture)
-        subject = 'fully implemented and passing'
-        self.reporter.assert_has_calls([
-            call.success(subject, 'given', 'some scenario'),
-            call.success(subject, 'when', 'something is invoked'),
-            call.success(subject, 'collect', 'results'),
-            call.success(subject, 'then', 'something happens'),
-            call.success(subject, 'then', 'something is calculated'),
-            call.success(subject, 'after', 'cleanup')]
+        self.mock = self.reporter
+        self.calls = self.mock.mock_calls
+        self.spec = spec_description
+
+    def test_full_passing(self):
+        self.run_spec(
+            examples.fully_implemented_and_passing,
+            'fully implemented and passing'
+        )
+        self.mock.assert_has_calls([
+            call.success(self.spec, 'given', 'some scenario'),
+            call.success(self.spec, 'when', 'something is invoked'),
+            call.success(self.spec, 'collect', 'results'),
+            call.success(self.spec, 'then', 'something happens'),
+            call.success(self.spec, 'then', 'something is calculated'),
+            call.success(self.spec, 'after', 'cleanup')]
         )
 
     def test_spec_with_assertion_failure(self):
-        self.loader.load_specs.return_value = [examples.spec_with_failure]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        spec = 'spec with failure'
-        self.reporter.assert_has_calls([
-                call.failure(spec, 'it should fail', ANY),
-                call.success(spec, 'then', 'it should run other assertions')],
+        self.run_spec(examples.spec_with_failure, 'spec with failure')
+
+        self.mock.assert_has_calls([
+            call.failure(self.spec, 'it should fail', ANY),
+            call.success(self.spec, 'then', 'it should run other assertions')],
             any_order=True
         )
         # TODO: make assertions about the exception that was reported
 
     def test_spec_with_assertion_error(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_with_assertion_error]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        spec = 'spec with assertion error'
-        self.reporter.assert_has_calls([
-            call.error(spec, 'then', 'it should raise an error', ANY),
-            call.success(spec, 'then', 'it should run other assertions'),
-            call.success(spec, 'after', 'cleanup')
+        self.run_spec(
+            examples.spec_with_assertion_error, 'spec with assertion error'
+        )
+        self.mock.assert_has_calls([
+            call.error(self.spec, 'then', 'it should raise an error', ANY),
+            call.success(self.spec, 'then', 'it should run other assertions'),
+            call.success(self.spec, 'after', 'cleanup')
         ])
         # TODO: make assertions about the exception that was reported
 
     def test_spec_with_error_before_assertions(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_with_error_before_assertions]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        spec = 'spec with error before assertions'
-        self.reporter.assert_has_calls([
-            call.error(spec, 'given', 'an exception is raised', ANY),
-            call.success(spec, 'after', 'should be executed to clean up')
+        self.run_spec(
+            examples.spec_with_error_before_assertions,
+            'spec with error before assertions'
+        )
+        self.mock.assert_has_calls([
+            call.error(self.spec, 'given', 'an exception is raised', ANY),
+            call.success(self.spec, 'after', 'should be executed to clean up')
         ])
-        calls = self.reporter.mock_calls
-        self.assertNotIn(call.success(ANY, 'when', ANY), calls)
-        self.assertNotIn(call.success(ANY, 'collect', ANY), calls)
-        self.assertNotIn(call.success(ANY, 'then', ANY), calls)
+        self.assertNotIn(call.success(ANY, 'when', ANY), self.calls)
+        self.assertNotIn(call.success(ANY, 'collect', ANY), self.calls)
+        self.assertNotIn(call.success(ANY, 'then', ANY), self.calls)
         # TODO: make assertions about the exception that was reported
 
     def test_spec_with_error_before_assertions_with_no_cleanup(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_with_error_before_assertions_without_cleanup]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        spec = 'spec with error before assertions without cleanup'
-        self.assertSequenceEqual(self.reporter.mock_calls, [
-            call.error(spec, 'when', 'an exception is raised', ANY),
+        self.run_spec(
+            examples.spec_with_error_before_assertions_without_cleanup,
+            'spec with error before assertions without cleanup'
+        )
+        self.assertSequenceEqual(self.mock.mock_calls, [
+            call.error(self.spec, 'when', 'an exception is raised', ANY),
         ])
 
-
     def test_spec_with_error_after_assertions(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_with_error_after_assertions]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        spec = 'spec with error after assertions'
-        self.reporter.assert_has_calls([
-            call.success(spec, 'given', 'setup'),
-            call.success(spec, 'when', 'action'),
-            call.success(spec, 'collect', 'result'),
-            call.success(spec, 'then', 'something'),
-            call.success(spec, 'then', 'something else'),
-            call.error(spec, 'after', 'an exception is raised', ANY)
+        self.run_spec(
+            examples.spec_with_error_after_assertions,
+            'spec with error after assertions'
+        )
+        self.mock.assert_has_calls([
+            call.success(self.spec, 'given', 'setup'),
+            call.success(self.spec, 'when', 'action'),
+            call.success(self.spec, 'collect', 'result'),
+            call.success(self.spec, 'then', 'something'),
+            call.success(self.spec, 'then', 'something else'),
+            call.error(self.spec, 'after', 'an exception is raised', ANY)
         ])
         # TODO: make assertions about the exception that was reported
 
     def test_spec_with_errors_before_and_after_assertions(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_with_error_before_and_after_assertions]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        spec = 'spec with error before and after assertions'
+        self.run_spec(
+            examples.spec_with_error_before_and_after_assertions,
+            'spec with error before and after assertions'
+        )
         self.reporter.assert_has_calls([
-            call.success(spec, 'given', 'setup'),
-            call.success(spec, 'when', 'action'),
-            call.error(spec, 'collect', 'result', ANY),
-            call.error(spec, 'after', 'an exception is raised', ANY)
+            call.success(self.spec, 'given', 'setup'),
+            call.success(self.spec, 'when', 'action'),
+            call.error(self.spec, 'collect', 'result', ANY),
+            call.error(self.spec, 'after', 'an exception is raised', ANY)
         ])
         # TODO: make assertions about the exceptions that were reported
 
     def test_spec_with_no_assertions(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_without_assertions]
-        runner.run_specs(self.loader, self.reporter, self.capture)
+        self.run_spec(
+            examples.spec_without_assertions,
+            'spec without assertions'
+        )
         self.assertEqual(
             self.reporter.mock_calls[0],
-            call.error(
-                'spec without assertions',
-                'collect steps',
-                'not implemented',
-                ANY)
+            call.error(self.spec, 'collect steps', 'not implemented', ANY)
         )
 
         # TODO: exception should indicate that the spec is not implemented
 
     def test_spec_that_fails_initialization(self):
-        self.loader.load_specs.return_value = \
-            [examples.spec_that_fails_initialization]
-        runner.run_specs(self.loader, self.reporter, self.capture)
-        self.reporter.assert_has_calls([
-            call.error('spec that fails initialization', ANY, ANY, ANY)
-        ])
+        self.run_spec(
+            examples.spec_that_fails_initialization,
+            'spec that fails initialization'
+        )
+        self.reporter.assert_has_calls([call.error(self.spec, ANY, ANY, ANY)])
 
         # TODO: exception should indicate that spec steps were not applied correctly.
 
