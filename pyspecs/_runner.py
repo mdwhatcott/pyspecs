@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from inspect import getmembers, ismethod, isclass, isfunction
+from itertools import chain
 from sys import exc_info
 from pyspecs._should import ShouldError
 from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
@@ -33,7 +34,7 @@ def collect_steps(spec):
     if any(extra_steps):
         return extra_steps_steps(spec, extra_steps)
 
-    return list(flatten(steps.values()))
+    return list(chain(*steps.values()))
 
 
 def constructor_error_steps(spec):
@@ -68,24 +69,6 @@ def extra_steps_steps(spec, extra):
         raise SpecInitializationError.extra_steps(spec, extra)
 
     return [Step(spec, describe(collect_steps), extra_steps)]
-
-
-def flatten(list_with_lists):
-    """
-    Turns a list with lists as elements into a flat list.
-
-    flatten([1, 2, 3, [4, 5], 6]) == [1, 2, 3, 4, 5, 6]
-
-    (Not recursive)
-    """
-    for element in list_with_lists:
-        if isinstance(element, list):
-            for item in element:
-                if item:
-                    yield item
-        else:
-            if element:
-                yield element
 
 
 class SpecSteps(object):
