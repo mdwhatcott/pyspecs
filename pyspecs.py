@@ -1,6 +1,6 @@
 from os import getcwd, walk
-import sys
-from pyspecs._loader import SpecLoader, Location, Importer
+from sys import __stdout__ as console
+from pyspecs._loader import Location, Importer, load_spec_classes
 from pyspecs._reporter import DotReporter
 from pyspecs._runner import run_specs
 
@@ -8,6 +8,6 @@ from pyspecs._runner import run_specs
 working_dir = getcwd()
 walker = (Location(step) for step in walk(working_dir))
 importer = Importer(working_dir)
-loader = SpecLoader(walker, importer)
-reporter = DotReporter(sys.__stdout__)
+loader = lambda: load_spec_classes(walker, importer)
+reporter = DotReporter(console)
 run_specs(loader, reporter, reporter)

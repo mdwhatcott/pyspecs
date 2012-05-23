@@ -14,9 +14,9 @@ def run_specs(loader, reporter, captured_stdout):
                 step.execute()
 
 
-def load_specs(loader, reporter):
-    for spec in loader.load_specs():
-        yield SpecSteps(reporter, collect_steps(spec))
+def load_specs(load_specs, reporter):
+    for spec in load_specs():
+        yield Spec(reporter, collect_steps(spec))
 
 
 def collect_steps(spec):
@@ -71,7 +71,7 @@ def extra_steps_steps(spec, extra):
     return [Step(spec, describe(collect_steps), extra_steps)]
 
 
-class SpecSteps(object):
+class Spec(object):
     def __init__(self, reporter, steps):
         self.reporter = reporter
         self.steps = steps

@@ -15,7 +15,7 @@ class TestSpecs(TestCase):
 
     def run_spec(self, spec, spec_description):
         self.spec = spec_description
-        self.loader.load_specs.return_value = spec
+        self.loader.return_value = spec
         runner.run_specs(self.loader, self.mock, self.capture)
 
     def _extract_exception_from_call(self, call_index):

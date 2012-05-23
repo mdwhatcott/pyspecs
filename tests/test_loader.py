@@ -1,6 +1,6 @@
 from exceptions import Exception, KeyError, ImportError, NotImplementedError
 from unittest import TestCase
-from pyspecs._loader import SpecLoader, Location, Importer, BlankModule
+from pyspecs._loader import Location, Importer, BlankModule, load_spec_classes
 from pyspecs.spec import spec
 
 
@@ -49,8 +49,7 @@ class TestLoadSpecFromSpecModule(TestCase):
         }))
 
     def test_load_spec_and_ignore_non_spec(self):
-        loader = SpecLoader(self.walker, self.importer)
-        specs = list(loader.load_specs())
+        specs = list(load_spec_classes(self.walker, self.importer))
         self.assertEqual(1, len(specs))
         self.assertEqual(TheSpec, specs[0])
 

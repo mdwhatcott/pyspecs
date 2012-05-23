@@ -5,24 +5,16 @@ from os.path import commonprefix
 from pyspecs.spec import spec
 
 
-class SpecLoader(object):
-    def __init__(self, walker, importer):
-        self.walker = walker
-        self.importer = importer
+def load_spec_classes(walker, importer):
+    for location in walker:
+        for path in location.py_spec_modules:
+            module = importer.import_module(path)
+            for cls in extract_spec_classes(module):
+                yield cls
 
-    def load_specs(self):
-        for location in self.walker:
-            for path in location.py_spec_modules:
-                module = self.importer.import_module(path)
-                for cls in self._extract_specs(module):
-                    yield cls
-
-    def _extract_specs(self, module):
-        contents = vars(module)
-        inspect.getmembers(module, inspect.isclass)
-        for value in contents.itervalues():
-            if inspect.isclass(value) and issubclass(value, spec):
-                yield value
+def extract_spec_classes(module):
+    return (c for c in vars(module).itervalues()
+        if inspect.isclass(c) and issubclass(c, spec))
 
 
 class Importer(object):
