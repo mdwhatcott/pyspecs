@@ -1,16 +1,3 @@
-# Several flavors (
-#   DotConsoleReporter,
-#   StoryConsoleReporter,
-#   HtmlReporter,
-#
-#   JsonReporter,
-#   GrowlReporter,
-#   etc...,
-# )
-# 1. Receive executed step
-# 2. Formulate representation of step and its parent spec for report (text, html, etc...)
-# 3. Show overview/stats
-
 from StringIO import StringIO
 from abc import abstractmethod
 import sys
@@ -19,9 +6,6 @@ import sys
 class Reporter(object):
     def __init__(self, io=None):
         self.captured = io or StringIO()
-
-    def capture_stdout(self):
-        return self.__enter__()
 
     def __enter__(self):
         sys.stdout = self.captured
@@ -45,14 +29,15 @@ class Reporter(object):
 
 
 class DotReporter(Reporter):
-    def __init__(self):
+    def __init__(self, console):
         Reporter.__init__(self)
+        self.console = console
 
     def success(self, spec_name, step, step_name):
-        pass
+        self.console.write('.')
 
     def failure(self, spec_name, step_name, exc_stuff):
-        pass
+        self.console.write('F')
 
     def error(self, spec_name, step, step_name, exc_stuff):
-        pass
+        self.console.write('E')

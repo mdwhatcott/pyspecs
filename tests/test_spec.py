@@ -3,7 +3,7 @@ from mock import Mock, call, ANY, MagicMock
 from pyspecs import _runner as runner
 from pyspecs._runner import SpecInitializationError
 from pyspecs._should import ShouldError
-from tests import examples
+from tests import example_specs as examples
 
 
 class TestSpecs(TestCase):
@@ -174,7 +174,7 @@ class TestSpecs(TestCase):
     def test_inheritance_of_steps(self):
         self.run_spec(
             [examples.child],
-            'child spec, using a base spec'
+            'child, using a parent'
         )
         self.mock.assert_has_calls([
             call.success(self.spec, 'given', 'setup'),
