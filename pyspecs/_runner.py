@@ -183,6 +183,9 @@ class SpecInitializationError(Exception):
         super(SpecInitializationError, self).__init__(*args, **kwargs)
         self.message = message
 
+    def __repr__(self):
+        return 'SpecInitializationError("{0}")'.format(self.message)
+
     @classmethod
     def constructor_error(cls, spec):
         message = 'The spec ({0}) could not be ' \

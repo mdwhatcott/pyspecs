@@ -124,7 +124,6 @@ class This(object):
             raise ShouldError(report())
 
 
-
 class ShouldError(AssertionError):
     """
     This framework's version of AssertionError
