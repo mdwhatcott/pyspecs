@@ -77,6 +77,7 @@ class TestSpecs(TestCase):
         )
         self.assertSequenceEqual(self.mock.mock_calls, [
             call.error(self.spec, 'when', 'an exception is raised', ANY),
+            call.spec_complete(),
         ])
         self.assertIsInstance(self._extract_exception_from_call(0), KeyError)
 
@@ -93,7 +94,7 @@ class TestSpecs(TestCase):
             call.success(self.spec, 'then', 'something else'),
             call.error(self.spec, 'after', 'an exception is raised', ANY)
         ])
-        self.assertIsInstance(self._extract_exception_from_call(-1), KeyError)
+        self.assertIsInstance(self._extract_exception_from_call(-2), KeyError)
 
     def test_spec_with_errors_before_and_after_assertions(self):
         self.run_spec(
@@ -151,11 +152,15 @@ class TestSpecs(TestCase):
         )
         self.mock.assert_has_calls([
             call.error(self.spec[0], 'collect steps', 'extra steps', ANY),
+            call.spec_complete(),
             call.error(self.spec[1], 'collect steps', 'extra steps', ANY),
+            call.spec_complete(),
             call.error(self.spec[2], 'collect steps', 'extra steps', ANY),
+            call.spec_complete(),
             call.error(self.spec[3], 'collect steps', 'extra steps', ANY),
+            call.spec_complete(),
         ])
-        exceptions = [self._extract_exception_from_call(x) for x in range(4)]
+        exceptions = [self._extract_exception_from_call(x) for x in [0, 2, 4, 6]]
         self.assertTrue(
             all(isinstance(e, SpecInitializationError) for e in exceptions))
         expected_messages = [

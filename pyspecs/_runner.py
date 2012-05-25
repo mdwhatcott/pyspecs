@@ -86,6 +86,8 @@ class Spec(object):
         while self._current is not None:
             yield self._current
 
+        self.reporter.spec_complete()
+
     @property
     def _current(self):
         return self.steps[self._current_index] \

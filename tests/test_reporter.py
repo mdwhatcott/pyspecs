@@ -4,8 +4,8 @@ from pyspecs._reporter import DotReporter
 
 
 ASSERTION_PASSED = '.'
-FAILURE = 'X'
-ERROR = 'E'
+FAILURE = 'x'
+ERROR = 'e'
 
 
 class TestDotReporter(TestCase):
