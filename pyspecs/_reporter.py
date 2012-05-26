@@ -3,7 +3,7 @@ from collections import OrderedDict
 import traceback
 from abc import abstractmethod
 import sys
-from pyspecs._runner import SpecInitializationError
+from pyspecs._spec import SpecInitializationError
 from pyspecs._should import ShouldError
 from pyspecs._steps import THEN_STEP, COLLECT_STEP, AFTER_STEP
 

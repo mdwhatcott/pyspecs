@@ -2,7 +2,7 @@ from os import getcwd, walk
 from sys import __stdout__ as console
 from pyspecs._loader import Location, Importer, load_spec_classes
 from pyspecs._reporter import StoryReporter
-from pyspecs import _runner as runner
+from pyspecs import _spec as runner
 
 
 def main():

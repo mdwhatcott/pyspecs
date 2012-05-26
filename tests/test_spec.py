@@ -1,7 +1,7 @@
 from unittest.case import TestCase
 from mock import Mock, call, ANY, MagicMock
-from pyspecs import _runner as runner
-from pyspecs._runner import SpecInitializationError
+from pyspecs import _spec as runner
+from pyspecs._spec import SpecInitializationError
 from pyspecs._should import ShouldError
 from tests import example_specs as examples
 
