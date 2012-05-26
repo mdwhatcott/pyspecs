@@ -1,6 +1,6 @@
-from abc import abstractmethod
 from StringIO import StringIO
 import sys
+import time
 import traceback
 from pyspecs._spec import SpecInitializationError
 from pyspecs._should import ShouldError
@@ -13,6 +13,8 @@ class Reporter(object):
         self.specs = list()
         self.current_spec = list()
         self.results = dict.fromkeys([PASSED, FAILED, ERRORS])
+        self.finished = None
+        self.started = time.time()
 
     def __enter__(self):
         sys.stdout = self.captured
@@ -42,9 +44,8 @@ class Reporter(object):
         self.specs.append(self.current_spec)
         self.current_spec = list()
 
-    @abstractmethod
     def finish(self):
-        pass
+        self.finished = time.time()
 
     def _retrieve_captured_output(self):
         output = self.captured.getvalue()
@@ -87,6 +88,7 @@ class ConsoleReporter(Reporter):
         Reporter.spec_complete(self)
 
     def finish(self):
+        Reporter.finish(self)
         self._report_problematic_specs()
         self._report_statistics()
 
@@ -155,8 +157,8 @@ class ConsoleReporter(Reporter):
                     for spec in self.specs)
 
         message.write('-' * 79 + '\n')
-        summary = 'Ran {} specs with {} assertions in {}.\n\n'.format(
-            len(self.specs), assertions, '[duration] seconds') # TODO: duration
+        summary = 'Ran {} specs with {} assertions in {:.3f}s.\n\n'.format(
+            len(self.specs), assertions, self.finished - self.started)
         message.write(summary)
 
         passed = not self.results[FAILED] and not self.results[ERRORS]
