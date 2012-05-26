@@ -4,6 +4,7 @@ import traceback
 from abc import abstractmethod
 import sys
 from pyspecs._runner import SpecInitializationError
+from pyspecs._should import ShouldError
 from pyspecs._steps import THEN_STEP, COLLECT_STEP, AFTER_STEP
 
 
@@ -11,7 +12,8 @@ class Reporter(object):
     def __init__(self, capture=None):
         self.captured = capture or StringIO()
         self.specs = list() # list of 'specs', each a list of ReportableSteps
-        self.specs.append(list())
+        self.current = list()
+        self.results = dict(Passed=0, Failed=0, Errors=0)
 
     def __enter__(self):
         sys.stdout = self.captured
@@ -21,20 +23,25 @@ class Reporter(object):
         sys.stdout = sys.__stdout__
         return not any([exc_type, exc_val, exc_tb])
 
-    @abstractmethod
     def success(self, spec_name, step, step_name):
-        pass
+        output = self._retrieve_captured_output()
+        self._log_step(spec_name, step, step_name, output=output)
+        if step == THEN_STEP:
+            self.results[PASSED] += 1
 
-    @abstractmethod
     def failure(self, spec_name, step_name, exc_stuff):
-        pass
+        output = self._retrieve_captured_output()
+        self._log_step(spec_name, THEN_STEP, step_name, exc_stuff, output)
+        self.results[FAILED] += 1
 
-    @abstractmethod
     def error(self, spec_name, step, step_name, exc_stuff):
-        pass
+        output = self._retrieve_captured_output()
+        self._log_step(spec_name, step, step_name, exc_stuff, output)
+        self.results[ERRORS] += 1
 
     def spec_complete(self):
-        self.specs.append(list())
+        self.specs.append(self.current)
+        self.current = list()
 
     @abstractmethod
     def finish(self):
@@ -46,7 +53,7 @@ class Reporter(object):
         return output
 
     def _log_step(self, spec_name, step, step_name, exc_stuff=None, output=None):
-        self.specs[-1].append(
+        self.current.append(
             ReportableStep(spec_name, step, step_name, exc_stuff, output))
 
 
@@ -59,47 +66,23 @@ class StoryReporter(Reporter):
             self.results[key] = 0
 
     def success(self, spec_name, step, step_name):
-        output = self._retrieve_captured_output()
-        self._log_step(spec_name, step, step_name, output=output)
-        if step == THEN_STEP:
-            self.results[PASSED] += 1
+        Reporter.success(self, spec_name, step, step_name)
 
     def failure(self, spec_name, step_name, exc_stuff):
-        output = self._retrieve_captured_output()
-        self._log_step(spec_name, THEN_STEP, step_name, exc_stuff, output)
-        self.results[FAILED] += 1
+        Reporter.failure(self, spec_name, step_name, exc_stuff)
 
     def error(self, spec_name, step, step_name, exc_stuff):
-        output = self._retrieve_captured_output()
-        self._log_step(spec_name, step, step_name, exc_stuff, output)
-        self.results[ERRORS] += 1
+        Reporter.error(self, spec_name, step, step_name, exc_stuff)
 
     def spec_complete(self):
-        steps = [step for step in self.specs[-1]
+        steps = [step for step in self.current
                  if step.exc_info or step.step not in [COLLECT_STEP, AFTER_STEP]]
         self.console.write(format_spec_for_console(steps))
         Reporter.spec_complete(self)
 
     def finish(self):
-        self.report_problematic_specs()
-        self.report_statistics()
-
-    def report_problematic_specs(self):
-        self.console.write('\n\n')
-        problematic_specs = [format_spec_for_console(s) for s in self.specs
-                             if any(step.exc_info for step in s)]
-        for spec in problematic_specs:
-            self.console.write(spec)
-
-    def report_statistics(self):
-        self.console.write('Ran {0} specs with {1} assertions.'.format(
-            len(self.specs), sum(len(spec) for spec in self.specs)))
-        if not self.results['Failed'] and not self.results['Errors']:
-            self.console.write(' (ok)\n')
-        else:
-            self.console.write('\n\n')
-            for key, value in self.results.iteritems():
-                self.console.write('{0}: {1}\n'.format(key, value))
+        report_problematic_specs_to_console(self.console, self.specs)
+        report_statistics_to_console(self.console, self.specs, self.results)
 
 
 class DotReporter(Reporter):
@@ -111,44 +94,32 @@ class DotReporter(Reporter):
             self.results[key] = 0
 
     def success(self, spec_name, step, step_name):
-        output = self._retrieve_captured_output()
-        self._log_step(spec_name, step, step_name, output=output)
+        Reporter.success(self, spec_name, step, step_name)
         if step == THEN_STEP:
             self.console.write('.')
-            self.results[PASSED] += 1
 
     def failure(self, spec_name, step_name, exc_stuff):
-        output = self._retrieve_captured_output()
-        self._log_step(spec_name, THEN_STEP, step_name, exc_stuff, output)
+        Reporter.failure(self, spec_name, step_name, exc_stuff)
         self.console.write('x')
-        self.results[FAILED] += 1
 
     def error(self, spec_name, step, step_name, exc_stuff):
-        output = self._retrieve_captured_output()
-        self._log_step(spec_name, step, step_name, exc_stuff, output)
+        Reporter.error(self, spec_name, step, step_name, exc_stuff)
         self.console.write('e')
-        self.results[ERRORS] += 1
+
+    def spec_complete(self):
+        Reporter.spec_complete(self)
 
     def finish(self):
-        self.report_problematic_specs()
-        self.report_statistics()
+        report_problematic_specs_to_console(self.console, self.specs)
+        report_statistics_to_console(self.console, self.specs, self.results)
 
-    def report_problematic_specs(self):
-        self.console.write('\n\n')
-        problematic_specs = [format_spec_for_console(s) for s in self.specs
-                             if any(step.exc_info for step in s)]
-        for spec in problematic_specs:
-            self.console.write(spec)
 
-    def report_statistics(self):
-        self.console.write('Ran {0} specs with {1} assertions.'.format(
-            len(self.specs), sum(len(spec) for spec in self.specs)))
-        if not self.results['Failed'] and not self.results['Errors']:
-            self.console.write(' (ok)\n')
-        else:
-            self.console.write('\n\n')
-            for key, value in self.results.iteritems():
-                self.console.write('{0}: {1}\n'.format(key, value))
+def report_problematic_specs_to_console(console, specs):
+    console.write('\n\n')
+    problematic_specs = [format_spec_for_console(s) for s in specs
+                         if any(step.exc_info for step in s)]
+    for spec in problematic_specs:
+        console.write(spec)
 
 
 def format_spec_for_console(spec):
@@ -204,6 +175,21 @@ def format_step_for_console(step):
     return formatted.getvalue()
 
 
+def report_statistics_to_console(console, specs, results):
+    assertions = sum(len([step for step in spec if step.step == THEN_STEP])
+        for spec in specs)
+
+    console.write('Ran {0} specs with {1} assertions.'.format(
+        len(specs), assertions))
+
+    if not results['Failed'] and not results['Errors']:
+        console.write(' (ok)\n')
+    else:
+        console.write('\n\n')
+        for key, value in results.iteritems():
+            console.write('{0}: {1}\n'.format(key, value))
+
+
 class ReportableStep(object):
     def __init__(self, spec_name, step, step_name, exc_info=None, output=None):
         self.spec_name = spec_name
@@ -225,8 +211,11 @@ class ReportableStep(object):
             return str()
 
         exc = traceback.format_exception(*self.exc_info)
-        if self.exception_type != SpecInitializationError:
+        if isinstance(self.exception_value, SpecInitializationError):
             exc.remove(exc[1])
+        elif isinstance(self.exception_value, ShouldError):
+            if len(exc) >= 3:
+                exc = exc[:-3]
 
         return '\n'.join(exc).replace('\n\n', '\n').strip().split('\n')
 
