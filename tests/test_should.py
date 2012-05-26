@@ -1,6 +1,6 @@
 from unittest.case import TestCase
 from pyspecs._should import PREPARATION_ERROR, ShouldError, should_expectation
-from pyspecs.spec import this
+from pyspecs import this
 
 class TestShouldAssertions(TestCase):
     def setUp(self):

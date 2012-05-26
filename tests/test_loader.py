@@ -1,7 +1,7 @@
 from exceptions import Exception, KeyError, ImportError, NotImplementedError
 from unittest import TestCase
 from pyspecs._loader import Location, Importer, BlankModule, load_spec_classes
-from pyspecs.spec import spec
+from pyspecs import spec
 
 
 class TestImporter(TestCase):
@@ -37,11 +37,18 @@ class TestImporter(TestCase):
         imported = self.importer.import_module(module_path)
         self.assertIsInstance(imported, BlankModule)
 
+    def test_importer_does_not_import_files_that_are_off_limits(self):
+        off_limites = [
+            '/this/is/my/working/directory/__init__.py',
+            '/this/is/my/working/directory/module.pyc',
+            '/this/is/my/working/directory/module.pyo',
+        ]
+
 
 class TestLoadSpecFromSpecModule(TestCase):
     def setUp(self):
         self.walker = FakeWalk('', [
-            Location(('', [], ['file1_spec.py']))
+            Location(('', [], ['file1_spec.py'])),
         ])
         self.importer = FakeImporter(fake_module=FakeModule('file1_spec.py', {
             'the_spec': TheSpec,
@@ -52,6 +59,14 @@ class TestLoadSpecFromSpecModule(TestCase):
         specs = list(load_spec_classes(self.walker, self.importer))
         self.assertEqual(1, len(specs))
         self.assertEqual(TheSpec, specs[0])
+
+    def test_does_not_attempt_to_import_files_that_are_off_limites(self):
+        self.walker = FakeWalk('', [
+            Location(('', [], ['__init__.py'])),
+            Location(('', [], ['file1_spec.txt'])),
+        ])
+        specs = list(load_spec_classes(self.walker, self.importer))
+        self.assertEqual(0, len(specs))
 
 
 class TheSpec(spec): pass

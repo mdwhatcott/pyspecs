@@ -4,8 +4,7 @@ from itertools import chain
 from sys import exc_info
 from pyspecs._should import ShouldError
 from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
-from pyspecs.spec import spec
-
+from pyspecs import spec
 
 def run_specs(loader, reporter, captured_stdout):
     for spec in load_specs(loader, reporter):

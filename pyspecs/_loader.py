@@ -1,8 +1,8 @@
 import importlib
 import inspect
 import os
-from os.path import commonprefix
-from pyspecs.spec import spec
+from os.path import commonprefix, basename
+from pyspecs import spec
 
 
 def load_spec_classes(walker, importer):
@@ -14,7 +14,7 @@ def load_spec_classes(walker, importer):
 
 def extract_spec_classes(module):
     return (c for c in vars(module).itervalues()
-        if inspect.isclass(c) and issubclass(c, spec))
+        if inspect.isclass(c) and issubclass(c, spec) and c != spec)
 
 
 class Importer(object):
@@ -53,6 +53,8 @@ class Location(object):
 
     @property
     def py_spec_modules(self):
-        return [f for f in self._files
-                if not f.startswith('__') and
-                   (f.endswith('spec.py') or f.endswith('specs.py'))]
+        for f in self._files:
+            if basename(f).startswith('__'):
+                continue
+            if f.endswith('spec.py') or f.endswith('specs.py'):
+                yield f

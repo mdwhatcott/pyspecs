@@ -1,13 +1,15 @@
 from distutils.core import setup
 
+
 setup(
-    name='pyspecs2',
-    version='0.1',
+    name='pyspecs',
+    version='1.0',
     packages=['pyspecs', 'tests'],
+    scripts=['bin/pyspecs'],
     url='http://github.com/mdwhatcott/pyspecs',
     license='GPL',
     author='Michael Whatcott',
-    author_email='mdwhatcott+pyspecs.com',
+    author_email='mdwhatcott+pyspecs@gmail.com',
     description='Minimalistic BDD in Python',
     classifiers=[
         'Development Status :: 3 - Alpha',
