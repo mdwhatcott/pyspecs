@@ -1,6 +1,6 @@
 from StringIO import StringIO
 from unittest.case import TestCase
-from pyspecs._reporter import DotReporter
+from pyspecs._reporter import ConsoleReporter
 
 
 ASSERTION_PASSED = '.'
@@ -12,7 +12,7 @@ class TestDotReporter(TestCase):
     def setUp(self):
         self.console = StringIO()
         self.capture = StringIO()
-        self.reporter = DotReporter(self.console, self.capture)
+        self.reporter = ConsoleReporter(self.console, capture=self.capture)
 
     def test_capture_of_output(self):
         with self.reporter:
