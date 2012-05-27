@@ -93,10 +93,10 @@ class ConsoleReporter(Reporter):
         self._report_statistics()
 
     def _report_problematic_specs(self):
-        self.console.write('\n\n')
-        self.console.write('-' * 79 + '\n\n')
         problematic_specs = [self._format_spec(s) for s in self.specs
-                             if any(step.exc_info for step in s)]
+            if any(step.exc_info for step in s)]
+        if len(problematic_specs):
+            self.console.write('\n\n' + '-' * 79 + '\n\n')
         for spec in problematic_specs:
             self.console.write(spec)
 
@@ -156,13 +156,13 @@ class ConsoleReporter(Reporter):
         assertions = sum(len([step for step in spec if step.step == THEN_STEP])
                     for spec in self.specs)
 
-        message.write('-' * 79 + '\n')
+        message.write('\n' + '-' * 79 + '\n')
         summary = 'Ran {} specs with {} assertions in {:.3f}s.\n\n'.format(
             len(self.specs), assertions, self.finished - self.started)
         message.write(summary)
 
         passed = not self.results[FAILED] and not self.results[ERRORS]
-        message.write('(ok)\n' if passed else '({}={}, {}={})\n'.format(
+        message.write('(ok)\n' if passed else 'FAILED ({}={}, {}={})\n'.format(
                 FAILED, self.results[FAILED],
                 ERRORS, self.results[ERRORS]))
 
@@ -190,13 +190,21 @@ class ReportableStep(object):
             return str()
 
         exc = traceback.format_exception(*self.exc_info)
+        exc = self._remove_internal_traces(exc)
+
+        return '\n'.join(exc).replace('\n\n', '\n').strip().split('\n')
+
+    def _remove_internal_traces(self, exc):
         if isinstance(self.exception_value, SpecInitializationError):
             exc.remove(exc[1])
         elif isinstance(self.exception_value, ShouldError):
-            if len(exc) >= 3:
-                exc = exc[:-3]
+            if len(exc) >= 5:
+                exc = [exc[0]] + exc[2:-3]
+        elif isinstance(self.exception_value, Exception):
+            if len(exc) >= 2:
+                exc.remove(exc[1])
 
-        return '\n'.join(exc).replace('\n\n', '\n').strip().split('\n')
+        return exc
 
 
 ERRORS = 'errors'

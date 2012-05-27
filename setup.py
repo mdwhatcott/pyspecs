@@ -5,7 +5,7 @@ setup(
     name='pyspecs',
     version='1.0',
     packages=['pyspecs', 'tests'],
-    scripts=['bin/pyspecs'],
+    scripts=['bin/pyspecs', 'bin/pyspecs_idle'],
     url='http://github.com/mdwhatcott/pyspecs',
     license='GPL',
     author='Michael Whatcott',
