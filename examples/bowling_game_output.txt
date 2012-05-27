@@ -1,0 +1,879 @@
+====================================== 1 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+
+-------------------------------------------------------------------------------
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.006s.
+
+FAILED (failed=1, errors=0)
+
+====================================== 2 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+
+-------------------------------------------------------------------------------
+Ran 2 specs with 2 assertions in 0.003s.
+
+(ok)
+
+====================================== 3 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+
+-------------------------------------------------------------------------------
+Ran 2 specs with 2 assertions in 0.003s.
+
+(ok)
+
+====================================== 4 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+
+-------------------------------------------------------------------------------
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.006s.
+
+FAILED (failed=1, errors=0)
+
+====================================== 5 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+
+-------------------------------------------------------------------------------
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.004s.
+
+FAILED (failed=1, errors=0)
+
+====================================== 6 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - IndexError('list index out of range',)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/envs/pyspecs-dev/lib/python2.7/site-packages/pyspecs/_spec.py", line 144, in execute
+     .     self._action(self.spec)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 12, in score
+     .     if self._rolls[roll] + self._rolls[roll + 1] == 10:
+     . IndexError: list index out of range
+
+
+
+
+-------------------------------------------------------------------------------
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - IndexError('list index out of range',)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/envs/pyspecs-dev/lib/python2.7/site-packages/pyspecs/_spec.py", line 144, in execute
+     .     self._action(self.spec)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 41, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 12, in score
+     .     if self._rolls[roll] + self._rolls[roll + 1] == 10:
+     . IndexError: list index out of range
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.004s.
+
+FAILED (failed=0, errors=1)
+
+====================================== 7 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 43, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+
+-------------------------------------------------------------------------------
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16 - ShouldError("Expected '13' to equal '16'.",)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 43, in the_final_score_should_be_16
+     .     the(self.game.score()).should.equal(16)
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.004s.
+
+FAILED (failed=1, errors=0)
+
+====================================== 8 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.004s.
+
+(ok)
+
+====================================== 9 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+
+-------------------------------------------------------------------------------
+Ran 3 specs with 3 assertions in 0.004s.
+
+(ok)
+
+====================================== 10 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24 - IndexError('list index out of range',)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/envs/pyspecs-dev/lib/python2.7/site-packages/pyspecs/_spec.py", line 144, in execute
+     .     self._action(self.spec)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 57, in the_the_final_score_should_be_24
+     .     the(self.game.score()).should.equal(24)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 21, in score
+     .     if self._is_spare(roll):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 9, in _is_spare
+     .     return self._current_frame(roll) == 10
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 15, in _current_frame
+     .     return self._rolls[roll] + self._rolls[roll + 1]
+     . IndexError: list index out of range
+
+
+
+
+-------------------------------------------------------------------------------
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24 - IndexError('list index out of range',)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/envs/pyspecs-dev/lib/python2.7/site-packages/pyspecs/_spec.py", line 144, in execute
+     .     self._action(self.spec)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 57, in the_the_final_score_should_be_24
+     .     the(self.game.score()).should.equal(24)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 21, in score
+     .     if self._is_spare(roll):
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 9, in _is_spare
+     .     return self._current_frame(roll) == 10
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 15, in _current_frame
+     .     return self._rolls[roll] + self._rolls[roll + 1]
+     . IndexError: list index out of range
+
+
+
+-------------------------------------------------------------------------------
+Ran 4 specs with 4 assertions in 0.005s.
+
+FAILED (failed=0, errors=1)
+
+====================================== 11 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24 - IndexError('list index out of range',)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/envs/pyspecs-dev/lib/python2.7/site-packages/pyspecs/_spec.py", line 144, in execute
+     .     self._action(self.spec)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 57, in the_the_final_score_should_be_24
+     .     the(self.game.score()).should.equal(24)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 21, in score
+     .     if self._rolls[roll] == 10:
+     . IndexError: list index out of range
+
+
+
+
+-------------------------------------------------------------------------------
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24 - IndexError('list index out of range',)
+     . Traceback (most recent call last):
+     .   File "/Users/mdwhatcott/code/envs/pyspecs-dev/lib/python2.7/site-packages/pyspecs/_spec.py", line 144, in execute
+     .     self._action(self.spec)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game_specs.py", line 57, in the_the_final_score_should_be_24
+     .     the(self.game.score()).should.equal(24)
+     .   File "/Users/mdwhatcott/code/spike/bowling/game.py", line 21, in score
+     .     if self._rolls[roll] == 10:
+     . IndexError: list index out of range
+
+
+
+-------------------------------------------------------------------------------
+Ran 4 specs with 4 assertions in 0.004s.
+
+FAILED (failed=0, errors=1)
+
+====================================== 12 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 4 specs with 4 assertions in 0.004s.
+
+(ok)
+
+====================================== 13 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 4 specs with 4 assertions in 0.004s.
+
+(ok)
+
+====================================== 14 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 15 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 16 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.033s.
+
+(ok)
+
+====================================== 17 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 18 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 19 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 20 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.006s.
+
+(ok)
+
+====================================== 21 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 22 ======================================
+
+"gutter game, using a fresh bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a fresh bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a fresh bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a fresh bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a fresh bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
+
+====================================== 23 ======================================
+
+"gutter game, using a bowling game"
+     given a fresh game
+     when all gutter balls are thrown
+     then the final score should be zero
+
+
+"perfect game, using a bowling game"
+     given a fresh game
+     when all throws are strikes
+     then the final score should be 300
+
+
+"all ones, using a bowling game"
+     given a fresh game
+     when all throws know down one pin
+     then the final score should be twenty
+
+
+"spare, using a bowling game"
+     given a fresh game
+     when a spare is thrown
+     then the final score should be 16
+
+
+"strike, using a bowling game"
+     given a fresh game
+     when a strike is thrown
+     then the the final score should be 24
+
+
+
+-------------------------------------------------------------------------------
+Ran 5 specs with 5 assertions in 0.005s.
+
+(ok)
