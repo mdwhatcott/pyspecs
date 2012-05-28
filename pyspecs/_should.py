@@ -1,4 +1,4 @@
-class This(object):
+class Should(object):
     """
     Should-style assertion class.
     """
@@ -133,12 +133,6 @@ class ShouldError(AssertionError):
         self.report = report
         self.traceback = None
 
-    def trace(self, traceback):
-        self.traceback = traceback
-
-    def __str__(self):
-        return self.report
-
 
 NO_EXCEPTION = "'{0}' executed successfully but should have raised '{1}'!"
 INCORRECT_EXCEPTION = "Should have raised '{0}' but raised '{1}' instead."
@@ -164,5 +158,5 @@ UNEXPECTED = EXPECTED + "NOT "
 
 
 def should_expectation(function):
-    setattr(This, function.__name__, function)
+    setattr(Should, function.__name__, function)
     return function

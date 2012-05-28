@@ -1,9 +1,9 @@
 from pyspecs._steps import _step, _skip
 from pyspecs import _steps
-from pyspecs._should import This as _This
+from pyspecs._should import Should as _Should
 
 
-this = the = that = it = then_ = _This
+this = the = that = it = then_ = _Should
 
 given = _step(_steps.GIVEN_STEP)
 when = _step(_steps.WHEN_STEP)
