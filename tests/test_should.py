@@ -1,5 +1,5 @@
 from unittest.case import TestCase
-from pyspecs._should import PREPARATION_ERROR, ShouldError, should_expectation
+from pyspecs._should import PREPARATION_ERROR, should_expectation
 from pyspecs import this
 
 class TestShouldAssertions(TestCase):
@@ -190,7 +190,7 @@ class TestShouldAssertions(TestCase):
     def _fails(self, action, report):
         try:
             action()
-        except ShouldError as error:
+        except AssertionError as error:
             assert error.message == report,\
                 'Assertion failed as expected but ' \
                 'gave the wrong error message!' \

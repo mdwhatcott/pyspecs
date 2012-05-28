@@ -2,7 +2,6 @@ from unittest.case import TestCase
 from mock import Mock, call, ANY, MagicMock
 from pyspecs import _spec as runner
 from pyspecs._spec import SpecInitializationError
-from pyspecs._should import ShouldError
 from tests import example_specs as examples
 
 
@@ -43,7 +42,8 @@ class TestSpecs(TestCase):
             call.success(self.spec, 'then', 'it should run other assertions')],
             any_order=True
         )
-        self.assertIsInstance(self._extract_exception_from_call(0), ShouldError)
+        self.assertIsInstance(
+            self._extract_exception_from_call(0), AssertionError)
 
     def test_spec_with_assertion_error(self):
         self.run_spec(

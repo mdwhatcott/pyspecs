@@ -97,15 +97,15 @@ class Should(object):
 
         except exception as e:
             if message is not None and message != e.message:
-                raise ShouldError(INCORRECT_EXCEPTION_MESSAGE.format(
+                raise AssertionError(INCORRECT_EXCEPTION_MESSAGE.format(
                     exception.__name__, message, e.message))
 
         except Exception as e:
-            raise ShouldError(INCORRECT_EXCEPTION.format(
+            raise AssertionError(INCORRECT_EXCEPTION.format(
                 exception.__name__, e.__class__.__name__))
 
         else:
-            raise ShouldError(NO_EXCEPTION.format(
+            raise AssertionError(NO_EXCEPTION.format(
                 self._value.__name__, exception.__name__))
 
     def raise_an(self, exception, message=None):
@@ -116,22 +116,11 @@ class Should(object):
 
     def _assert(self, action, report):
         if self._invert is None:
-            raise ShouldError(PREPARATION_ERROR)
+            raise AssertionError(PREPARATION_ERROR)
 
         result = action()
-
-        if (self._invert and result) or (not self._invert and not result):
-            raise ShouldError(report())
-
-
-class ShouldError(AssertionError):
-    """
-    This framework's version of AssertionError
-    """
-    def __init__(self, report):
-        AssertionError.__init__(self, report)
-        self.report = report
-        self.traceback = None
+        assert (result and not self._invert) or (not result and self._invert), \
+            report()
 
 
 NO_EXCEPTION = "'{0}' executed successfully but should have raised '{1}'!"

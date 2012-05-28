@@ -2,7 +2,6 @@ from collections import OrderedDict
 from inspect import getmembers, ismethod, isclass, isfunction
 from itertools import chain
 from sys import exc_info
-from pyspecs._should import ShouldError
 from pyspecs._steps import \
     PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP, \
     PYSPECS_SKIPPED, SKIPPED_SPEC
@@ -166,7 +165,7 @@ class Step(object):
 
         try:
             self._action(self.spec)
-        except ShouldError:
+        except AssertionError:
             self._on_failure(exc_info())
         except Exception:
             self._on_error(exc_info())

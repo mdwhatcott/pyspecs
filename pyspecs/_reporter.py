@@ -4,7 +4,6 @@ import sys
 import time
 import traceback
 from pyspecs._spec import SpecInitializationError
-from pyspecs._should import ShouldError
 from pyspecs._steps import THEN_STEP, COLLECT_STEP, AFTER_STEP, SKIPPED_SPEC
 
 
@@ -214,7 +213,7 @@ class ReportableStep(object):
     def _remove_internal_traces(self, exc):
         if isinstance(self.exception_value, SpecInitializationError):
             exc.remove(exc[1])
-        elif isinstance(self.exception_value, ShouldError):
+        elif isinstance(self.exception_value, AssertionError):
             if len(exc) >= 5:
                 exc = [exc[0]] + exc[2:-3]
         elif isinstance(self.exception_value, Exception):
