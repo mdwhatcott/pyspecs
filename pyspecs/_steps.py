@@ -1,5 +1,6 @@
 PYSPECS_PREFIX = '_pyspecs_'
 PYSPECS_STEP = PYSPECS_PREFIX + 'step'
+PYSPECS_SKIPPED = PYSPECS_PREFIX + 'skipped'
 SPEC = 'spec'
 GIVEN_STEP = 'given'
 WHEN_STEP = 'when'
@@ -13,6 +14,8 @@ ALL_STEPS = [
     THEN_STEP,
     AFTER_STEP,
 ]
+SKIPPED_STEP = 'skipped'
+SKIPPED_SPEC = '(skipped spec)'
 
 
 def _step(name):
@@ -20,3 +23,9 @@ def _step(name):
         setattr(object, PYSPECS_STEP, name)
         return object
     return decorator
+
+
+def _skip(obj):
+    setattr(obj, PYSPECS_SKIPPED, True)
+    return obj
+

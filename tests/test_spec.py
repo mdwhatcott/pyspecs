@@ -189,3 +189,28 @@ class TestSpecs(TestCase):
             call.success(self.spec, 'then', 'something else'),
             call.success(self.spec, 'after', 'cleanup')
         ])
+
+    def test_skipped_spec_is_not_run(self):
+        self.run_spec(
+            [examples.this_spec_should_be_skipped],
+            'this spec should be skipped'
+        )
+        self.mock.assert_has_calls([
+            call.skip(self.spec, '(skipped spec)', 'skipped spec'),
+            call.spec_complete()
+        ])
+
+    def test_skipped_step_is_not_run(self):
+        self.run_spec(
+            [examples.skipped_assertion],
+            'skipped assertion'
+        )
+        self.mock.assert_has_calls([
+            call.success(self.spec, 'given', 'some scenario'),
+            call.success(self.spec, 'when', 'something is invoked'),
+            call.success(self.spec, 'collect', 'results'),
+            call.skip(self.spec, 'then', 'something happens'),
+            call.success(self.spec, 'then', 'something is calculated'),
+            call.success(self.spec, 'after', 'cleanup'),
+            call.spec_complete()
+        ])

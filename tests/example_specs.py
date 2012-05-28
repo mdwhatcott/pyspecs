@@ -1,4 +1,4 @@
-from pyspecs import given, when, collect, then, after, spec, this
+from pyspecs import given, when, collect, then, after, spec, this, skip
 
 
 class fully_implemented_and_passing(spec):
@@ -242,4 +242,58 @@ class child(spec, using_a_parent):
 
     @then
     def something_else(self):
+        pass
+
+
+@skip
+class this_spec_should_be_skipped(spec):
+    @given
+    def some_scenario(self):
+        pass
+
+    @when
+    def something_is_invoked(self):
+        pass
+
+    @collect
+    def results(self):
+        pass
+
+    @then
+    def something_happens(self):
+        pass
+
+    @then
+    def something_is_calculated(self):
+        pass
+
+    @after
+    def cleanup(self):
+        pass
+
+
+class skipped_assertion(spec):
+    @given
+    def some_scenario(self):
+        pass
+
+    @when
+    def something_is_invoked(self):
+        pass
+
+    @collect
+    def results(self):
+        pass
+
+    @skip
+    @then
+    def something_happens(self):
+        pass
+
+    @then
+    def something_is_calculated(self):
+        pass
+
+    @after
+    def cleanup(self):
         pass

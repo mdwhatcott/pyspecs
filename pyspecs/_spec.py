@@ -3,8 +3,10 @@ from inspect import getmembers, ismethod, isclass, isfunction
 from itertools import chain
 from sys import exc_info
 from pyspecs._should import ShouldError
-from pyspecs._steps import PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP
-from pyspecs import spec
+from pyspecs._steps import \
+    PYSPECS_STEP, ALL_STEPS, THEN_STEP, AFTER_STEP, \
+    PYSPECS_SKIPPED, SKIPPED_SPEC
+from pyspecs import spec, skip
 
 
 def run_specs(loader, reporter, captured_stdout):
@@ -20,6 +22,9 @@ def load_specs(load_specs, reporter):
 
 
 def collect_steps(spec):
+    if getattr(spec, PYSPECS_SKIPPED, None):
+        return skipped_spec_steps(spec)
+
     try:
         spec = spec()
     except Exception:
@@ -35,6 +40,13 @@ def collect_steps(spec):
         return extra_steps_steps(spec, extra_steps)
 
     return list(chain(*steps.values()))
+
+def skipped_spec_steps(spec):
+    @skip
+    def skipped_spec(spec):
+        pass
+
+    return [Step(describe(spec), SKIPPED_SPEC, skipped_spec)]
 
 
 def constructor_error_steps(spec):
@@ -76,7 +88,8 @@ class Spec(object):
         self.reporter = reporter
         self.steps = steps
         for step in self.steps:
-            step.with_callbacks(self._success, self._failure, self._error)
+            step.with_callbacks(
+                self._success, self._failure, self._error, self._skip)
         self._current_index = 0
 
     def __iter__(self):
@@ -122,6 +135,11 @@ class Spec(object):
         self.reporter.success(step.spec_name, step.step, step.name)
         self._next()
 
+    def _skip(self):
+        step = self._current
+        self.reporter.skip(step.spec_name, step.step, step.name)
+        self._next()
+
 
 class Step(object):
     def __init__(self, spec, step, action):
@@ -133,13 +151,19 @@ class Step(object):
         self._on_success = None
         self._on_failure = None
         self._on_error = None
+        self._on_skip = None
 
-    def with_callbacks(self, success, failure, error):
+    def with_callbacks(self, success, failure, error, skip):
         self._on_success = success
         self._on_failure = failure
         self._on_error = error
+        self._on_skip = skip
 
     def execute(self):
+        if getattr(self._action, PYSPECS_SKIPPED, None):
+            self._on_skip()
+            return
+
         try:
             self._action(self.spec)
         except ShouldError:

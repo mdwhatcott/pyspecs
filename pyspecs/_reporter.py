@@ -1,10 +1,11 @@
 from StringIO import StringIO
+from collections import OrderedDict
 import sys
 import time
 import traceback
 from pyspecs._spec import SpecInitializationError
 from pyspecs._should import ShouldError
-from pyspecs._steps import THEN_STEP, COLLECT_STEP, AFTER_STEP
+from pyspecs._steps import THEN_STEP, COLLECT_STEP, AFTER_STEP, SKIPPED_SPEC
 
 
 class Reporter(object):
@@ -12,7 +13,8 @@ class Reporter(object):
         self.captured = capture or StringIO()
         self.specs = list()
         self.current_spec = list()
-        self.results = dict.fromkeys([PASSED, FAILED, ERRORS])
+        self.results = OrderedDict.fromkeys(
+            [SPECS, PASSED, FAILED, ERRORS, SKIPPED_SPECS, SKIPPED])
         self.finished = None
         self.started = time.time()
 
@@ -23,6 +25,13 @@ class Reporter(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = sys.__stdout__
         return not any([exc_type, exc_val, exc_tb])
+
+    def skip(self, spec_name, step, step_name):
+        self._log_step(spec_name, step, step_name, skipped=True)
+        if step == THEN_STEP:
+            self.results[SKIPPED] += 1
+        elif step == SKIPPED_SPEC:
+            self.results[SKIPPED_SPECS] += 1
 
     def success(self, spec_name, step, step_name):
         output = self._retrieve_captured_output()
@@ -42,6 +51,7 @@ class Reporter(object):
 
     def spec_complete(self):
         self.specs.append(self.current_spec)
+        self.results[SPECS] += 1
         self.current_spec = list()
 
     def finish(self):
@@ -52,9 +62,11 @@ class Reporter(object):
         self.captured.buf = str()
         return output
 
-    def _log_step(self, spec_name, step, step_name, exc_stuff=None, output=None):
+    def _log_step(self, spec_name, step, step_name,
+                  exc_stuff=None, output=None, skipped=False):
         self.current_spec.append(
-            ReportableStep(spec_name, step, step_name, exc_stuff, output))
+            ReportableStep(
+                spec_name, step, step_name, exc_stuff, output, skipped))
 
 
 class ConsoleReporter(Reporter):
@@ -64,6 +76,13 @@ class ConsoleReporter(Reporter):
         for key in self.results:
             self.results[key] = 0
         self.verbosity = verbosity
+        if self.verbosity:
+            self.console.write(header('Specs'))
+
+    def skip(self, spec_name, step, step_name):
+        Reporter.skip(self, spec_name, step, step_name)
+        if not self.verbosity and step == THEN_STEP:
+            self.console.write('s')
 
     def success(self, spec_name, step, step_name):
         Reporter.success(self, spec_name, step, step_name)
@@ -82,9 +101,7 @@ class ConsoleReporter(Reporter):
 
     def spec_complete(self):
         if self.verbosity:
-            steps = [step for step in self.current_spec
-                if step.exc_info or step.step not in [COLLECT_STEP, AFTER_STEP]]
-            self.console.write(self._format_spec(steps))
+            self.console.write(self._format_spec(self.current_spec))
         Reporter.spec_complete(self)
 
     def finish(self):
@@ -96,13 +113,18 @@ class ConsoleReporter(Reporter):
         problematic_specs = [self._format_spec(s) for s in self.specs
             if any(step.exc_info for step in s)]
         if len(problematic_specs):
-            self.console.write('\n\n' + '-' * 79 + '\n\n')
+            self.console.write(header('Failures/Errors'))
         for spec in problematic_specs:
             self.console.write(spec)
 
     def _format_spec(self, spec):
         formatted = StringIO()
-        formatted.write('"{}"\n'.format(spec[0].spec_name))
+        formatted.write('"{}"'.format(spec[0].spec_name))
+        if spec[0].skipped and len(spec) == 1:
+            formatted.write(' (skipped)\n\n\n')
+            return formatted.getvalue()
+
+        formatted.write('\n')
 
         for step in spec:
             formatted.write(self._format_step(step))
@@ -115,30 +137,29 @@ class ConsoleReporter(Reporter):
         formatted = StringIO()
 
         if any(s.exc_info for s in spec) and any(s.output for s in spec):
-            formatted.write('-' * 31 + ' Captured Output ' + '-' * 31 + '\n')
+            formatted.write(header('Captured Output', padding='\n'))
             for step in spec:
                 if step.output:
                     formatted.write('| ({} {})\n'.format(
                         step.step.upper(), step.step_name))
                     pretty_output = '\n| '.join(step.output.split('\n'))
                     formatted.write('| ' + pretty_output + '\n')
-            formatted.write('-' * 79)
+            formatted.write(border())
         formatted.write('\n\n')
 
         return formatted.getvalue()
 
     def _format_step(self, step):
-        formatted = StringIO()
+        if step.step in [AFTER_STEP, COLLECT_STEP] and step.exc_info is None:
+            return str()
 
-        step_sequence = step.step\
-            if step.step != 'collect steps'\
-            else '({}) - '.format(step.step)
-        exc_message = '- ' + repr(step.exception_value)\
-            if step.exc_info is not None\
+        formatted = StringIO()
+        name = step.step_name + (' (skipped)' if step.skipped else str())
+        message = '- ' + repr(step.exception_value) \
+            if step.exc_info is not None \
             else str()
 
-        formatted.write('     {} {} {}\n'.format(
-            step_sequence, step.step_name, exc_message))
+        formatted.write('     {} {} {}\n'.format(step.step, name, message))
 
         if step.exc_info is None:
             return formatted.getvalue()
@@ -151,31 +172,27 @@ class ConsoleReporter(Reporter):
         return formatted.getvalue()
 
     def _report_statistics(self):
-        message = StringIO()
+        self.console.write(header('Statistics'))
+        for key, value in self.results.iteritems():
+            if value is 0:
+                continue
+            self.console.write('{0} {1}\n'.format(value, key))
 
-        assertions = sum(len([step for step in spec if step.step == THEN_STEP])
-                    for spec in self.specs)
-
-        message.write('\n' + '-' * 79 + '\n')
-        summary = 'Ran {} specs with {} assertions in {:.3f}s.\n\n'.format(
-            len(self.specs), assertions, self.finished - self.started)
-        message.write(summary)
+        self.console.write('\nDuration: {:.3f}s\n\n'.format(self.finished - self.started))
 
         passed = not self.results[FAILED] and not self.results[ERRORS]
-        message.write('(ok)\n' if passed else 'FAILED ({}={}, {}={})\n'.format(
-                FAILED, self.results[FAILED],
-                ERRORS, self.results[ERRORS]))
-
-        self.console.write(message.getvalue())
+        self.console.write('(ok)\n' if passed else 'FAILED\n')
 
 
 class ReportableStep(object):
-    def __init__(self, spec_name, step, step_name, exc_info=None, output=None):
+    def __init__(self, spec_name, step, step_name,
+                 exc_info=None, output=None, skipped=False):
         self.spec_name = spec_name
         self.step = step
         self.step_name = step_name
         self.exc_info = exc_info
         self.output = output or str()
+        self.skipped = skipped
 
     @property
     def exception_type(self):
@@ -207,6 +224,19 @@ class ReportableStep(object):
         return exc
 
 
+SPECS = 'specs'
 ERRORS = 'errors'
-FAILED = 'failed'
-PASSED = 'passed'
+FAILED = 'assertions failed'
+PASSED = 'assertions passed'
+SKIPPED = 'assertions skipped'
+SKIPPED_SPECS = 'specs skipped'
+
+
+def header(message, delimiter='-', padding='\n\n'):
+    length = len(message) + len('  ')
+    border = delimiter * ((80 - length) / 2)
+    return '{0}{1} {2} {1}{0}'.format(padding, border, message)
+
+
+def border(delimiter='-', padding='\n'):
+    return '{0}{1}{0}'.format(padding, delimiter * 79)
