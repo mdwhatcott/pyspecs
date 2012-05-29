@@ -69,37 +69,37 @@ class Reporter(object):
 
 
 class ConsoleReporter(Reporter):
-    def __init__(self, console, verbosity=0, capture=None):
+    def __init__(self, console, verbose=False, capture=None):
         Reporter.__init__(self, capture)
         self.console = console
         for key in self.results:
             self.results[key] = 0
-        self.verbosity = verbosity
-        if self.verbosity:
+        self.verbose = verbose
+        if self.verbose:
             self.console.write(header('Specs'))
 
     def skip(self, spec_name, step, step_name):
         Reporter.skip(self, spec_name, step, step_name)
-        if not self.verbosity and step == THEN_STEP:
+        if not self.verbose and step == THEN_STEP:
             self.console.write('s')
 
     def success(self, spec_name, step, step_name):
         Reporter.success(self, spec_name, step, step_name)
-        if not self.verbosity and step == THEN_STEP:
+        if not self.verbose and step == THEN_STEP:
             self.console.write('.')
 
     def failure(self, spec_name, step_name, exc_stuff):
         Reporter.failure(self, spec_name, step_name, exc_stuff)
-        if not self.verbosity:
+        if not self.verbose:
             self.console.write('x')
 
     def error(self, spec_name, step, step_name, exc_stuff):
         Reporter.error(self, spec_name, step, step_name, exc_stuff)
-        if not self.verbosity:
+        if not self.verbose:
             self.console.write('e')
 
     def spec_complete(self):
-        if self.verbosity:
+        if self.verbose:
             self.console.write(self._format_spec(self.current_spec))
         Reporter.spec_complete(self)
 

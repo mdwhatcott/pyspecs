@@ -23,6 +23,54 @@ or...
     $ python setup.py
 </pre>
 
+## Writing specs
+
+Specifications are identified by subclassing from the spec class.  From there
+the idea is then to lay out the specification in steps (given-when-then). The
+following steps are available to each subclass of spec as method decorators and
+are executed in the order listed:
+
+given - The context for the specification, the initial setup phase.
+when - This is where to invoke the action under test.
+collect - Allows the aggregation of results for ease when making assertions.
+then - This is where assertions are made (more details below) about the results arrived at in the when and collect steps.
+after - Analogous to the tearDown method in unit-testing frameworks.
+
+## Assertions
+
+The simplest assertion can be made by using the built-in assert statement:
+
+<pre>
+assert 42 == 'The answer the life, the universe and everything'
+</pre>
+
+For readability this project provides a more fluent (link) method for making
+assertions:
+
+<pre>
+
+# These imported names are all synonyms for the class that
+# provides fluent assertions (Should). Use whichever provides
+# the best readability.  The general patter is:
+# >>> the(<value>).should.<condition_method>(<comparison_args>)
+#  or...
+# >>> the(<value>).should_NOT.<condition_method>(<comparision_args>) # negated!
+
+from pyspecs import the, this, that, it, then
+
+
+this(42).should.equal(42) # this passes
+
+then_([1, 2, 3]).should.contain(2) # this also passes
+
+the(list()).should.be_empty() # passes
+
+that(1).should_NOT.be_greater_than(100) # passes
+
+# raises AssertionError, caught by framework, logged as failure
+that(200).should.be_less_than(0)
+
+</pre>
 
 ## Example
 
@@ -49,6 +97,38 @@ class simple_addition(spec):
 def add(a, b):
     return a + b
 
+</pre>
+
+
+## Execution of specs
+
+Beyond providing the python library which will be explained below, installation
+provides two command-line scripts into the environment, meant to be invoked
+from the root of your project.  Each will execute all specs in .py files
+ending in 'spec.py' or 'specs.py'.
+
+For one-time execution of specs:
+
+<pre>
+    $ pyspecs
+</pre>
+
+To begin an auto-test loop (runs all specs anytime a .py file is saved):
+
+<pre>
+    $ pyspecs_idle
+</pre>
+
+To increase verbosity (default is 'dot'):
+
+<pre>
+    $ pyspecs --verbosity=story
+</pre>
+
+or...
+
+<pre>
+    $ pyspecs_idle --verbosity=story
 </pre>
 
 ### Output

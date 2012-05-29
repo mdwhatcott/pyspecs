@@ -12,15 +12,15 @@ def main():
     walker = (Location(step) for step in walk(working_dir))
     importer = Importer(working_dir)
     loader = lambda: load_spec_classes(walker, importer)
-    reporter = ConsoleReporter(console, verbosity=args.verbosity)
+    reporter = ConsoleReporter(console, verbose=args.verbosity == 'story')
     runner.run_specs(loader, reporter, reporter)
     reporter.finish()
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbosity', type=int,
-                        help='0 for dots or 1 for full stories')
+    parser.add_argument('--verbosity', default='dot',
+                        help="'dot' or 'story'")
     args = parser.parse_args()
     return args
 
