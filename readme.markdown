@@ -31,11 +31,11 @@ the idea is then to lay out the specification in steps (given-when-then). The
 following steps are available to each subclass of spec as method decorators and
 are executed in the order listed:
 
-__given__ - The context for the specification, the initial setup phase.
-__when__ - This is where to invoke the action under test.
-__collect__ - Allows the aggregation of results for ease when making assertions.
-__then__ - This is where assertions are made (more details below) about the results arrived at in the when and collect steps.
-__after__ - Analogous to the tearDown method in unit-testing frameworks.
+__given__ - The context for the specification, the initial setup phase.<br>
+__when__ - This is where to invoke the action under test.<br>
+__collect__ - Allows the aggregation of results for ease when making assertions.<br>
+__then__ - This is where assertions are made (more details below) about the results arrived at in the when and collect steps.<br>
+__after__ - Analogous to the tearDown method in unit-testing frameworks.<br>
 
 ## Assertions
 
