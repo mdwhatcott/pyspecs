@@ -28,6 +28,9 @@ or...
 
 <pre>
 
+from pyspecs import spec, given, when, then, the
+
+
 class simple_addition(spec):
     @given
     def two_numbers(self):
