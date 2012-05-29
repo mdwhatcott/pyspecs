@@ -1,3 +1,4 @@
+
 pyspecs - Minimalistic BDD in Python.
 =====================================
 
@@ -30,11 +31,11 @@ the idea is then to lay out the specification in steps (given-when-then). The
 following steps are available to each subclass of spec as method decorators and
 are executed in the order listed:
 
-given - The context for the specification, the initial setup phase.
-when - This is where to invoke the action under test.
-collect - Allows the aggregation of results for ease when making assertions.
-then - This is where assertions are made (more details below) about the results arrived at in the when and collect steps.
-after - Analogous to the tearDown method in unit-testing frameworks.
+__given__ - The context for the specification, the initial setup phase.
+__when__ - This is where to invoke the action under test.
+__collect__ - Allows the aggregation of results for ease when making assertions.
+__then__ - This is where assertions are made (more details below) about the results arrived at in the when and collect steps.
+__after__ - Analogous to the tearDown method in unit-testing frameworks.
 
 ## Assertions
 
@@ -52,20 +53,20 @@ assertions:
 # These imported names are all synonyms for the class that
 # provides fluent assertions (Should). Use whichever provides
 # the best readability.  The general patter is:
-# >>> the(<value>).should.<condition_method>(<comparison_args>)
+# >>> the([value]).should.[condition_method]([comparison_args])
 #  or...
-# >>> the(<value>).should_NOT.<condition_method>(<comparision_args>) # negated!
+# >>> the([value]).should_NOT.[condition_method]([comparision_args]) # negated!
 
 from pyspecs import the, this, that, it, then
 
 
 this(42).should.equal(42) # this passes
 
-then_([1, 2, 3]).should.contain(2) # this also passes
+this([1, 2, 3]).should.contain(2) # this also passes
 
 the(list()).should.be_empty() # passes
 
-that(1).should_NOT.be_greater_than(100) # passes
+it(1).should_NOT.be_greater_than(100) # passes
 
 # raises AssertionError, caught by framework, logged as failure
 that(200).should.be_less_than(0)
@@ -134,7 +135,7 @@ or...
 ### Output
 
 <pre>
-$ pyspecs
+$ pyspecs --verbosity=story
 
 ------------------------------------ Specs ------------------------------------
 
