@@ -1,6 +1,7 @@
 import argparse
 from os import getcwd, walk
 from sys import __stdout__ as console
+import sys
 from pyspecs._loader import Location, Importer, load_spec_classes
 from pyspecs._reporter import ConsoleReporter
 from pyspecs import _spec as runner
@@ -9,6 +10,7 @@ from pyspecs import _spec as runner
 def main():
     args = parse_args()
     working_dir = getcwd()
+    sys.path.append(working_dir)
     walker = (Location(step) for step in walk(working_dir))
     importer = Importer(working_dir)
     loader = lambda: load_spec_classes(walker, importer)
