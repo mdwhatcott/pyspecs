@@ -4,8 +4,14 @@ from distutils.core import setup
 setup(
     name='pyspecs',
     version='1.0',
-    packages=['pyspecs', 'tests'],
+    packages=['pyspecs'],
     scripts=['bin/pyspecs', 'bin/pyspecs_idle'],
+    entry_points={
+        'console_scripts': [
+            'pyspecs = pyspecs._program:main',
+            'pyspecs_idle = pyspecs._idle:main',
+        ]
+    },
     url='http://github.com/mdwhatcott/pyspecs',
     license='GPL',
     author='Michael Whatcott',
