@@ -11,6 +11,10 @@ setup(
     author='Michael Whatcott',
     author_email='mdwhatcott+pyspecs@gmail.com',
     description='Minimalistic BDD in Python',
+    long_description='pyspecs is a testing framework that strives to achieve '
+                     'more readable specifications (tests) by leveraging '
+                     'some fancy syntactic sugar (python decorators) and '
+                     'auto-discovery of tests/specs.',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
