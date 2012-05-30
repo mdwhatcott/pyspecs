@@ -3,8 +3,8 @@ pyspecs - Minimalistic BDD in Python.
 =====================================
 
 pyspecs is a testing framework that strives to achieve more readable
-specifications (tests) by leveraging some fancy syntactic sugar (python
-decorators) and auto-discovery of tests/specs.  Installation is straightforward:
+specifications (tests) by leveraging some fancy syntactic sugar and
+auto-discovery of tests/specs.  Installation is straightforward:
 
 <pre>
     $ pip install pyspecs
@@ -45,7 +45,7 @@ The simplest assertion can be made by using the built-in assert statement:
 assert 42 == 'The answer the life, the universe and everything'
 </pre>
 
-For readability this project provides a more fluent (link) method for making
+For readability this project provides a more fluent method for making
 assertions:
 
 <pre>
@@ -55,7 +55,7 @@ assertions:
 # the best readability.  The general patter is:
 # >>> the([value]).should.[condition_method]([comparison_args])
 #  or...
-# >>> the([value]).should_NOT.[condition_method]([comparision_args]) # negated!
+# >>> the([value]).should_NOT.[condition_method]([comparison_args]) # negated!
 
 from pyspecs import the, this, that, it, then
 
