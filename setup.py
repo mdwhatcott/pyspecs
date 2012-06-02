@@ -1,15 +1,17 @@
 from distutils.core import setup
-
+from pyspecs import __version__
 
 setup(
     name='pyspecs',
-    version='1.0',
+    version=__version__,
     packages=['pyspecs'],
     scripts=['bin/pyspecs', 'bin/pyspecs_idle'],
     entry_points={
         'console_scripts': [
             'pyspecs = pyspecs._program:main',
+            'pyspecs_.py = pyspecs._program:main',
             'pyspecs_idle = pyspecs._idle:main',
+            'pyspecs_idle.py = pyspecs._idle:main',
         ]
     },
     url='http://github.com/mdwhatcott/pyspecs',
@@ -27,6 +29,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',
         'Operating System :: OS Independent',
+        'Environment :: Console',
         'Programming Language :: Python',
         'Topic :: Software Development :: Documentation',
         'Topic :: Software Development :: Libraries :: Python Modules',
