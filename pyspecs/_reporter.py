@@ -154,18 +154,25 @@ class ConsoleReporter(Reporter):
 
         formatted = StringIO()
         name = step.step_name + (' (skipped)' if step.skipped else str())
-        message = '- ' + repr(step.exception_value) \
-            if step.exc_info is not None \
-            else str()
+        message = str()
+        if step.step == THEN_STEP and isinstance(step.exception_value, AssertionError):
+            message = '(failed)'
+        elif step.exc_info is not None:
+            message = '(error)'
 
-        formatted.write('     {} {} {}\n'.format(step.step, name, message))
+
+        padding = '   '
+        if step.step == THEN_STEP:
+            padding = '   > '
+        formatted.write(padding + '{} {} {}\n'.format(step.step, name, message))
 
         if step.exc_info is None:
             return formatted.getvalue()
 
+        padding = padding.replace('>', ' ')
         formatted.write(
-              '     . ' +
-            '\n     . '.join(step.format_exception()) +
+                    padding + '. ' +
+            ('\n' + padding + '. ').join(step.format_exception()) +
             '\n')
 
         return formatted.getvalue()
@@ -208,7 +215,10 @@ class ReportableStep(object):
         exc = traceback.format_exception(*self.exc_info)
         exc = self._remove_internal_traces(exc)
 
-        return '\n'.join(exc).replace('\n\n', '\n').strip().split('\n')
+        formatted = '\n'.join(exc).replace('\n\n', '\n').strip().split('\n')
+        formatted[-1] = repr(self.exception_value)
+
+        return formatted
 
     def _remove_internal_traces(self, exc):
         if isinstance(self.exception_value, SpecInitializationError):
