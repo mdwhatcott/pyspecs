@@ -5,13 +5,13 @@ setup(
     name='pyspecs',
     version=__version__,
     packages=['pyspecs'],
-    scripts=['bin/pyspecs', 'bin/pyspecs_idle'],
+    scripts=[
+        'bin/pyspecs_.py',
+        'bin/pyspecs_idle.py'],
     entry_points={
         'console_scripts': [
             'pyspecs = pyspecs._program:main',
-            'pyspecs_.py = pyspecs._program:main',
             'pyspecs_idle = pyspecs._idle:main',
-            'pyspecs_idle.py = pyspecs._idle:main',
         ]
     },
     url='http://github.com/mdwhatcott/pyspecs',
