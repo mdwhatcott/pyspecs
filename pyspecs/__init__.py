@@ -2,7 +2,7 @@ from pyspecs._steps import _step, _skip
 from pyspecs import _steps
 from pyspecs._should import Should as _Should
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 this = the = that = it = then_ = _Should
 

@@ -160,7 +160,6 @@ class ConsoleReporter(Reporter):
         elif step.exc_info is not None:
             message = '(error)'
 
-
         padding = '   '
         if step.step == THEN_STEP:
             padding = '   > '
