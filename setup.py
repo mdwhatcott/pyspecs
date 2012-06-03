@@ -5,9 +5,6 @@ setup(
     name='pyspecs',
     version=__version__,
     packages=['pyspecs'],
-    scripts=[
-        'bin/pyspecs_.py',
-        'bin/pyspecs_idle.py'],
     entry_points={
         'console_scripts': [
             'pyspecs = pyspecs._program:main',

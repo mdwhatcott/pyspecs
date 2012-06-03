@@ -248,4 +248,4 @@ def header(message, delimiter='-', padding='\n\n'):
 
 
 def border(delimiter='-', padding='\n'):
-    return '{0}{1}{0}'.format(padding, delimiter * 79)
+    return '{0}{1}{0}'.format(padding, delimiter * 80)
