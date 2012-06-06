@@ -110,7 +110,7 @@ class ConsoleReporter(Reporter):
 
     def _report_problematic_specs(self):
         problematic_specs = [self._format_spec(s) for s in self.specs
-            if any(step.exc_info for step in s)]
+            if any(step.exc_info or step.step == SKIPPED_SPEC for step in s)]
         if len(problematic_specs):
             self.console.write(header('Failures/Errors'))
         for spec in problematic_specs:
@@ -177,16 +177,17 @@ class ConsoleReporter(Reporter):
         return formatted.getvalue()
 
     def _report_statistics(self):
-        self.console.write(header('Statistics'))
+        stats_header = header('{0} specs in {1:.3f}s'.format(
+            self.results[SPECS], self.finished - self.started))
+        self.console.write(stats_header)
+
         for key, value in self.results.iteritems():
-            if value is 0:
+            if value is 0 or key == SPECS:
                 continue
             self.console.write('{0} {1}\n'.format(value, key))
 
-        self.console.write('\nDuration: {:.3f}s\n\n'.format(self.finished - self.started))
-
         passed = not self.results[FAILED] and not self.results[ERRORS]
-        self.console.write('(ok)\n' if passed else 'FAILED\n')
+        self.console.write('\n\n(ok)\n' if passed else '\n\nFAILED\n')
 
 
 class ReportableStep(object):
