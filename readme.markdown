@@ -1,4 +1,3 @@
-
 pyspecs - Minimalistic BDD in Python.
 =====================================
 
@@ -157,8 +156,5 @@ Duration: 0.081s
 
 
 ### Project direction
-
-I manage the development of pyspecs using a public [Trello board](https://trello.com/board/pyspecs/4fbf04556417ff506355664e).
-Feel free to upvote ideas listed there.
 
 Feel free to fork the project and submit contributions if you're so inclined!
