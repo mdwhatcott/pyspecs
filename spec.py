@@ -1,5 +1,6 @@
 import importlib
 import os
+import time
 from _should import Should
 
 
@@ -21,6 +22,7 @@ class StepRunner(object):
 
 class ConsoleReporter(object):
     # TODO: report each step's success/failure/error
+    # TODO: report nice stack traces (remove framework entries)
     # TODO: report final stats
     # TODO: verbosity...
 
@@ -28,24 +30,66 @@ class ConsoleReporter(object):
         pass
 
 
+class StepReport(object):
+    def __init__(self, name):
+        self.name = name
+        self.started = None
+        self.finished = None
+        self.children = []
+        self.parent = None
+        self.failure_type = None
+        self.error_type = None
+        self.failure = None
+        self.error = None
+        self.traceback = None
+
+    @property
+    def duration(self):
+        return self.finished - self.started
+
+    def __str__(self):
+        pass
+
+
 class StepCounter(object):
-    # TODO: must preserve context of step (given, when, then, etc...)
-    # TODO: timing of steps and entire suite
-
-    def __init__(self, reporter):
+    def __init__(self, reporter, timer):
         self.reporter = reporter
+        self.timer = timer
+        self.current_step = None
+        self.steps = []
 
-    def start(self, step, name):
-        pass
+    def start(self, name):
+        report = StepReport(name)
+        self._associate_report(report, self.current_step is None)
+        report.started = self.timer()
 
-    def finish(self, name):
-        pass
+    def _associate_report(self, report, top_level):
+        if top_level:
+            self.steps.append(report)
+        else:  # ? Is a context manager at the same scope as another a child?
+            self.current_step.children.append(report)
+            report.parent = self.current_step
 
-    def error(self, name, exception_type, exception, traceback):
-        pass
+        self.current_step = report
 
-    def fail(self, name, exception_type, exception, traceback):
-        pass
+    def finish(self):
+        self.current_step.finished = self.timer()
+        if self.current_step.parent is None:
+            self.reporter.report(self.current_step)
+
+        self.current_step = self.current_step.parent
+
+    def error(self, exception_type, exception, traceback):
+        self.current_step.error_type = exception_type
+        self.current_step.error = exception
+        self.current_step.traceback = traceback
+        self.finish()
+
+    def fail(self, exception_type, exception, traceback):
+        self.current_step.failure_type = exception_type
+        self.current_step.failure = exception
+        self.current_step.traceback = traceback
+        self.finish()
 
 
 class Step(object):
@@ -57,7 +101,7 @@ class Step(object):
     @property
     def name(self):
         return '{0} {1}'\
-            .format(self._step, self._name)\
+            .format(self._step, self._name or '')\
             .replace('_', ' ')\
             .strip()
 
@@ -69,28 +113,29 @@ class Step(object):
         return self
 
     def __enter__(self):
-        self._counter.start(self._step, self.name)
+        self._counter.start(self.name)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
-            self._counter.finish(self.name)
+            self._counter.finish()
 
         elif isinstance(exc_val, AssertionError):
-            self._counter.fail(self.name, exc_type, exc_val, exc_tb)
+            self._counter.fail(exc_type, exc_val, exc_tb)
 
         elif isinstance(exc_val, KeyboardInterrupt):
             return False
 
         else:
-            self._counter.error(self.name, exc_type, exc_val, exc_tb)
+            self._counter.error(exc_type, exc_val, exc_tb)
 
+        self._name = None
         return True
 
 
 reporter = ConsoleReporter()
 runner = StepRunner(reporter)
-counter = StepCounter(reporter)
+counter = StepCounter(reporter, time.time)
 
 given = Step('given', counter)
 when = Step('when', counter)
