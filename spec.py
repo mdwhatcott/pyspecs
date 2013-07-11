@@ -14,7 +14,7 @@ class StepRunner(object):
                 if f.endswith('test.py') or \
                         f.endswith('tests.py') or \
                         f.startswith('test'):
-                    # TODO: magic to get the name and stuff right
+                    # TODO: magic to get the module name right
                     importlib.import_module(f)
 
         self.reporter.aggregate()
@@ -138,9 +138,15 @@ runner = StepRunner(reporter)
 counter = StepCounter(reporter, time.time)
 
 given = Step('given', counter)
+provided = Step('provided', counter)
+at = Step('at', counter)
 when = Step('when', counter)
 and_ = Step('and', counter)
 then = Step('then', counter)
+so = Step('so', counter)
+therefore = Step('therefore', counter)
+however = Step('however', counter)
+as_well_as = Step('as well as', counter)
 
 the = Should
 it = Should
