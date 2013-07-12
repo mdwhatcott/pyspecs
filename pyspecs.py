@@ -3,23 +3,47 @@ import importlib
 import os
 import time
 import traceback
-from _should import Should
+import sys
+from _should import _Should
 
 
-class StepRunner(object):
+__version__ = '2.0'
+
+
+class _StepRunner(object):
     def __init__(self, reporter):
         self.reporter = reporter
+        self.working = os.getcwd()
+        sys.path.append(self.working)  # precautionary??
 
     def load_steps(self):
-        for root, dirs, files in os.walk(os.getcwd()):
+        for root, dirs, files in os.walk(self.working):
             for f in files:
-                if f.endswith('test.py') or \
-                        f.endswith('tests.py') or \
-                        f.startswith('test'):
-                    # TODO: magic to get the module name right
-                    importlib.import_module(f)
+                if self._is_test_module(f):
+                    name = self._derive_module_name(os.path.join(root, f))
+                    self._import(name)
 
         self.reporter.aggregate()
+
+    def _is_test_module(self, f):
+        return f.endswith('test.py') or \
+            f.endswith('tests.py') or \
+            (f.startswith('test') and f.endswith('.py'))
+
+    # noinspection PyArgumentList
+    def _derive_module_name(self, path):
+        common = os.path.commonprefix([self.working, path])
+        slice_module_name = slice(len(common) + 1, len(path))
+        return path[slice_module_name] \
+            .replace('.py', '') \
+            .replace('\\', '.') \
+            .replace('/', '.')
+
+    def _import(self, name):
+        try:
+            importlib.import_module(name)
+        except (ImportError, NotImplementedError):
+            return
 
 
 class ConsoleReporter(object):
@@ -27,14 +51,28 @@ class ConsoleReporter(object):
     # TODO: report final stats
     # TODO: verbosity...
 
+    def __init__(self):
+        self._total_elapsed = 0
+        self._shortest_parent_step = None
+        self._longest_parent_step = None
+        self._average_parent_step_duration = None
+        self._average_child_step_duration = None
+
+        self._steps = 0
+        self._errors = 0
+        self._failures = 0
+        self._passed = 0
+
     def report(self, step_report):
+        self._steps += 1
         print step_report
 
     def aggregate(self):
-        pass
+        print '{0} passed, {1} failed, {2} errors ({3} total)'.format(
+            self._passed, self._failures, self._errors, self._steps)
 
 
-class StepReport(object):
+class _StepReport(object):
     PASSED = ''            # no news is good news
     FAILED = 'X'           # ballot 'x'
     ERROR = 'E'            # fire
@@ -105,7 +143,7 @@ class StepReport(object):
         return total_trace.getvalue()
 
 
-class StepCounter(object):
+class _StepCounter(object):
     def __init__(self, reporter, timer):
         self.reporter = reporter
         self.timer = timer
@@ -113,7 +151,7 @@ class StepCounter(object):
         self.steps = []
 
     def start(self, name):
-        report = StepReport(name)
+        report = _StepReport(name)
         self._associate_report(report, self.current_step is None)
         report.started = self.timer()
 
@@ -146,7 +184,7 @@ class StepCounter(object):
         self.finish()
 
 
-class Step(object):
+class _Step(object):
     def __init__(self, step, counter):
         self._step = step
         self._counter = counter
@@ -194,26 +232,25 @@ class Step(object):
         return True
 
 
-reporter = ConsoleReporter()
-runner = StepRunner(reporter)
-counter = StepCounter(reporter, time.time)
+_reporter = ConsoleReporter()
+_runner = _StepRunner(_reporter)
+_counter = _StepCounter(_reporter, time.time)
 
-given = Step('given', counter)
-provided = Step('provided', counter)
-at = Step('at', counter)
-when = Step('when', counter)
-and_ = Step('and', counter)
-then = Step('then', counter)
-so = Step('so', counter)
-therefore = Step('therefore', counter)
-however = Step('however', counter)
-as_well_as = Step('as well as', counter)
+given = _Step('given', _counter)
+provided = _Step('provided', _counter)
+at = _Step('at', _counter)
+when = _Step('when', _counter)
+and_ = _Step('and', _counter)
+then = _Step('then', _counter)
+so = _Step('so', _counter)
+therefore = _Step('therefore', _counter)
+however = _Step('however', _counter)
+as_well_as = _Step('as well as', _counter)
 
-the = Should
-it = Should
-this = Should
+the = _Should
+it = _Should
+this = _Should
 
 
-# TODO: this goes in a script installed in the path
 if __name__ == '__main__':
-    runner.load_steps()
+    _runner.load_steps()

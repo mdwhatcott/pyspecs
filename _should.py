@@ -1,4 +1,4 @@
-class Should(object):
+class _Should(object):
     """
     Should-style assertion class.
     """
@@ -147,5 +147,5 @@ UNEXPECTED = EXPECTED + "NOT "
 
 
 def should_expectation(function):
-    setattr(Should, function.__name__, function)
+    setattr(_Should, function.__name__, function)
     return function

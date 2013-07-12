@@ -1,4 +1,4 @@
-from spec import given, when, then, and_, the, this
+from pyspecs import given, when, then, and_, the, this
 
 
 with given.two_operands:
@@ -46,37 +46,3 @@ with when.there_are_several_asserts:
         this(False).should.equal(True)
     with then.the_third_has_an_error:
         this(int('asdf')).should_NOT.be_an(int)
-
-
-
-output = """
-|   given two operands
-|-   when supplied to the add function
-|--  then the sum should be mathematically correct
-|--   and the sum should be greater than either operand
-|-   when supplied to the subtract function
-|--  then the difference should be mathematically correct
-|
-|   given something else
-|-   when asdfasdf
-
-
-|        given two operands
-|-       when supplied to the add function
-|--      then the sum should be mathematically correct
-|--      and the sum should be greater than either operand
-|-       when supplied to the subtract function
-|--      then the difference should be mathematically correct
-|
-|    given something else
-|-   when asdfasdf
-
-
-given two operands
- when  supplied to the add function
- then   the sum should be mathematically correct
-  and   the sum should be greater than either operand
- when  supplied to the subtract function
- then   the difference should be mathematically correct
-
-"""
