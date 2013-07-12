@@ -23,7 +23,6 @@ class StepRunner(object):
 
 
 class ConsoleReporter(object):
-    # TODO: report each step's success/failure/error
     # TODO: report nice stack traces (remove framework entries)
     # TODO: report final stats
     # TODO: verbosity...
@@ -85,14 +84,9 @@ class StepReport(object):
         if not self.traceback:
             return self.name
 
-        if self.error:
-            return self.name + ' (*{0}: {1})'.format(
-                self.error.__class__.__name__, self.error.message).rstrip()
-        elif self.failure:
-            return self.name + ' (*{0}: {1})'.format(
-                self.failure.__class__.__name__, self.failure.message).rstrip()
-
-        return ''
+        error = self.error or self.failure
+        return self.name + ' (*{0}: {1})'.format(
+            error.__class__.__name__, error.message).rstrip()
 
     def _format_traceback(self, indent):
         if not self.traceback:
@@ -171,6 +165,13 @@ class Step(object):
 
         self._name = item
         return self
+
+    def __call__(self, *args, **kwargs):
+        """
+        TODO: this is where a skip keyword arg could be provided
+        TODO: this is where a long-running keyword arg could be provided
+        """
+        pass
 
     def __enter__(self):
         self._counter.start(self.name)
