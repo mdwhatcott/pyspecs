@@ -47,29 +47,29 @@ class Should(object):
     def be_greater_than(self, lesser):
         self._assert(
             action=lambda: self._value > lesser,
-            report=lambda:
-              (self._expect + GREATER_THAN).format(self._value, lesser)
+            report=lambda: (
+                self._expect + GREATER_THAN).format(self._value, lesser)
         )
 
     def be_less_than(self, greater):
         self._assert(
             action=lambda: self._value < greater,
-            report=lambda:
-              (self._expect + LESS_THAN).format(self._value, greater)
+            report=lambda: (
+                self._expect + LESS_THAN).format(self._value, greater)
         )
 
     def be_greater_than_or_equal_to(self, lesser):
         self._assert(
             action=lambda: self._value >= lesser,
-            report=lambda: (self._expect + GREATER_THAN_EQUAL).format(
-                self._value, lesser)
+            report=lambda: (
+                self._expect + GREATER_THAN_EQUAL).format(self._value, lesser)
         )
 
     def be_less_than_or_equal_to(self, greater):
         self._assert(
             action=lambda: self._value <= greater,
-            report=lambda: (self._expect + LESS_THAN_EQUAL)
-                .format(self._value, greater)
+            report=lambda: (
+                self._expect + LESS_THAN_EQUAL).format(self._value, greater)
         )
 
     def be(self, thing):
@@ -81,8 +81,8 @@ class Should(object):
     def be_between(self, first, last):
         self._assert(
             action=lambda: first < self._value < last,
-            report=lambda:
-              (self._expect + BETWEEN).format(self._value, first, last)
+            report=lambda: (
+                self._expect + BETWEEN).format(self._value, first, last)
         )
 
     def be_empty(self):

@@ -1,6 +1,8 @@
+from StringIO import StringIO
 import importlib
 import os
 import time
+import traceback
 from _should import Should
 
 
@@ -26,11 +28,21 @@ class ConsoleReporter(object):
     # TODO: report final stats
     # TODO: verbosity...
 
+    def report(self, step_report):
+        print step_report
+
     def aggregate(self):
         pass
 
 
 class StepReport(object):
+    PASSED = ''            # no news is good news
+    FAILED = 'X'           # ballot 'x'
+    ERROR = 'E'            # fire
+    SKIPPED = 'S'          # white flag
+    LIST_ITEM = u'\u2022'  # bullet
+    INDENT = '  '
+
     def __init__(self, name):
         self.name = name
         self.started = None
@@ -48,7 +60,55 @@ class StepReport(object):
         return self.finished - self.started
 
     def __str__(self):
-        pass
+        return self._format(0) + '\n'
+
+    def _format(self, level):
+        builder = StringIO()
+        message = self._compose_message(level)
+        builder.write(message.encode('utf-8'))
+        for c in self.children:
+            builder.write(c._format(level + 1))
+
+        return builder.getvalue()
+
+    def _compose_message(self, level):
+        status = self.PASSED if self.traceback is None else (
+            self.FAILED if self.error is None else self.ERROR)
+        indent = self.INDENT * level
+        name = self._format_step_name()
+        trace = self._format_traceback(indent)
+
+        return u'{0:2}|{1} {2} {3}\n{4}'.format(
+            status, indent, self.LIST_ITEM, name, trace)
+
+    def _format_step_name(self):
+        if not self.traceback:
+            return self.name
+
+        if self.error:
+            return self.name + ' (*{0}: {1})'.format(
+                self.error.__class__.__name__, self.error.message).rstrip()
+        elif self.failure:
+            return self.name + ' (*{0}: {1})'.format(
+                self.failure.__class__.__name__, self.failure.message).rstrip()
+
+        return ''
+
+    def _format_traceback(self, indent):
+        if not self.traceback:
+            return ''
+
+        trace_indent = indent + (' ' * 4)
+        template = '. |{0}{{0}}\n'.format(trace_indent)
+        raw_trace = traceback.format_tb(self.traceback)
+        total_trace = StringIO()
+
+        for t in raw_trace:
+            line_number, code = t.strip().split('\n')
+            total_trace.write(template.format(line_number))
+            total_trace.write(template.format(code))
+
+        return total_trace.getvalue()
 
 
 class StepCounter(object):

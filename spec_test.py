@@ -1,4 +1,4 @@
-from spec import given, when, then, and_, the
+from spec import given, when, then, and_, the, this
 
 
 with given.two_operands:
@@ -16,7 +16,7 @@ with given.two_operands:
             the(total).should.be_greater_than(b)
 
     with when.supplied_to_the_subtract_function:
-        difference = a - b
+        difference = b - a
 
         with then.the_difference_should_be_mathmatically_correct:
             the(difference).should.equal(1)
@@ -25,17 +25,51 @@ with given.two_operands:
     del a, b, total, difference
 
 
-output = """
- |   given two operands
- |-   when supplied to the add function
- |--  then the sum should be mathematically correct
- |--   and the sum should be greater than either operand
- |-   when supplied to the subtract function
- |--  then the difference should be mathematically correct
- |
- |   given something else
- |-   when asdfasdf
+with given.an_error_prone_situation:
+    with when.an_error_occurs:
+        result = 1 / 0
 
+        with then.the_result_will_not_be_available:
+            the(dir()).should_NOT.contain('result')
+
+
+with given.an_assertion_error:
+    with when.the_assertion_error_occurs:
+        with then.the_error_should_be_displayed:
+            this(True).should.equal(False)
+
+
+with when.there_are_several_asserts:
+    with then.the_first_should_pass:
+        this(True).should.equal(True)
+    with then.the_second_should_fail:
+        this(False).should.equal(True)
+    with then.the_third_has_an_error:
+        this(int('asdf')).should_NOT.be_an(int)
+
+
+
+output = """
+|   given two operands
+|-   when supplied to the add function
+|--  then the sum should be mathematically correct
+|--   and the sum should be greater than either operand
+|-   when supplied to the subtract function
+|--  then the difference should be mathematically correct
+|
+|   given something else
+|-   when asdfasdf
+
+
+|        given two operands
+|-       when supplied to the add function
+|--      then the sum should be mathematically correct
+|--      and the sum should be greater than either operand
+|-       when supplied to the subtract function
+|--      then the difference should be mathematically correct
+|
+|    given something else
+|-   when asdfasdf
 
 
 given two operands
