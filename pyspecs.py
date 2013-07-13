@@ -1,3 +1,11 @@
+# TODO: setup.py
+# TODO: test installation and usage (bowling game)
+# TODO: catalog bowling game example
+# TODO: documentation
+# TODO: decide on name and location on github
+# TODO: publish to pypi
+
+
 import os
 from _runner import (
     given,

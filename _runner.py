@@ -47,9 +47,6 @@ class _StepRunner(object):
 
 
 class ConsoleReporter(object):
-    # TODO: report nice stack traces (remove framework entries)
-    # TODO: verbosity...
-
     def __init__(self):
         self._prepare_for_upcoming_run()
 
@@ -60,15 +57,22 @@ class ConsoleReporter(object):
         self._errors = 0
         self._failures = 0
         self._passed = 0
+        self._problem_reports = []
 
     def report(self, step_report):
         self._scenarios += 1
-        self._steps += self._tally(step_report, lambda r: r)
+        self._total_duration += step_report.duration
         self._errors += self._tally(step_report, lambda r: r.error)
         self._failures += self._tally(step_report, lambda r: r.failure)
-        self._passed += self._tally(step_report, lambda r: r.traceback is None)
-        self._total_duration += step_report.duration
-        print step_report
+        all_passed = self._tally(step_report, lambda r: r.traceback is None)
+        all_steps = self._tally(step_report, lambda r: r)
+        self._steps += all_steps
+        self._passed += all_passed
+
+        if all_passed < all_steps:
+            self._problem_reports.append(step_report)
+        else:
+            print step_report
 
     def _tally(self, report, selector):
         total = bool(selector(report))
@@ -81,6 +85,11 @@ class ConsoleReporter(object):
         return total
 
     def aggregate(self):
+        if self._problem_reports:
+            print '\n******* Problem Scenarios *******\n'
+        for problem in self._problem_reports:
+            print problem
+
         duration = round(self._total_duration, 4)
         if not self._failures and not self._errors:
             print 'ok ({0} steps, {1} scenarios in {2} seconds)'.format(
@@ -233,13 +242,6 @@ class _Step(object):
 
         self._name = item
         return self
-
-    def __call__(self, *args, **kwargs):
-        """
-        TODO: this is where a skip keyword arg could be provided
-        TODO: this is where a long-running keyword arg could be provided
-        """
-        pass
 
     def __enter__(self):
         self._counter.start(self.name)
