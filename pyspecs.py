@@ -1,4 +1,4 @@
-# TODO: setup.py
+# Done: setup.py
 # TODO: test installation and usage (bowling game)
 # TODO: catalog bowling game example
 # TODO: documentation
@@ -28,5 +28,9 @@ from _runner import (
 __version__ = '2.0'
 
 
-if __name__ == '__main__':
+def main():
     _runner.load_steps(os.getcwd())
+
+
+if __name__ == '__main__':
+    main()
