@@ -1,30 +1,21 @@
 from distutils.core import setup
-from os.path import join, basename, splitext
-import os
 import pyspecs
 
 
-project = pyspecs.__name__
-root = os.getcwd()
-modules = [splitext(basename(f))[0] for f in os.listdir(root)
-           if f.endswith('.py') and f != 'setup.py']
-scripts = [join('bin', f)
-           for f in os.listdir(join(root, 'bin'))]
-
 setup(
-    name=project,
+    name='pyspecs',
     version=pyspecs.__version__,
-    py_modules=modules,
-    scripts=scripts,
-    url='https://github.com/mdwhatcott/{0}'.format(project),
+    packages=['pyspecs'],
+    scripts=['scripts/run_pyspecs.py'],
+    url='https://github.com/mdwhatcott/pyspecs',
     license='GPL',
     author='Michael Whatcott',
-    author_email='mdwhatcott+{0}@gmail.com'.format(project),
+    author_email='mdwhatcott+pyspecs@gmail.com',
     description='Concise BDD in python',
-    long_description='{0} is a testing framework that strives to achieve '
+    long_description='pyspecs is a testing framework that strives to achieve '
                      'more readable specifications (tests) by leveraging '
                      'some fancy syntactic sugar and auto-discovery of '
-                     'tests/specs.'.format(project),
+                     'tests/specs.',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

@@ -4,7 +4,6 @@ import time
 import StringIO
 import sys
 import traceback
-from _should import _Should
 
 
 class _StepRunner(object):
@@ -265,20 +264,5 @@ class _Step(object):
 
 
 _reporter = ConsoleReporter()
-_runner = _StepRunner(_reporter)
+_step_runner = _StepRunner(_reporter)
 _counter = _StepCounter(_reporter, time.time)
-
-given = _Step('given', _counter)
-provided = _Step('provided', _counter)
-at = _Step('at', _counter)
-when = _Step('when', _counter)
-and_ = _Step('and', _counter)
-then = _Step('then', _counter)
-so = _Step('so', _counter)
-therefore = _Step('therefore', _counter)
-however = _Step('however', _counter)
-as_well_as = _Step('as well as', _counter)
-
-the = _Should
-it = _Should
-this = _Should

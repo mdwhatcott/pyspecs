@@ -7,11 +7,12 @@
 
 import os
 import time
-import pyspecs
+from pyspecs._runner import _step_runner
 
 
 def _idle():
-    working = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    working = os.path.abspath(os.getcwd())
+    print 'working:', working
     repetitions = 0
     state = 0
     while True:
@@ -19,7 +20,7 @@ def _idle():
         if state != new_state:
             repetitions += 1
             _display_repetitions_banner(repetitions)
-            pyspecs._runner.load_steps(working)
+            _step_runner.load_steps(working)
             state = new_state
         time.sleep(.75)
 
