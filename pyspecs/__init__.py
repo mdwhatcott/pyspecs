@@ -1,12 +1,12 @@
 # Done: setup.py
-# TODO: test installation and usage (bowling game)
+# Done: test installation and usage (bowling game)
 # TODO: catalog bowling game example
 # TODO: documentation
 # TODO: decide on name and location on github
 # TODO: publish to pypi
 
 
-import os
+import sys
 from pyspecs._runner import _Step, _counter, _step_runner
 from pyspecs._should import _Should
 
@@ -30,9 +30,17 @@ it = _Should
 this = _Should
 
 
-def main():
-    _step_runner.load_steps(os.getcwd())
-
-
-if __name__ == '__main__':
-    main()
+# noinspection PyBroadException
+def catch(callable_):
+    """
+    Utility method for saving any exceptions raised from a callable.
+    """
+    sys.exc_clear()
+    try:
+        callable_()
+    except:
+        return sys.exc_info()
+    else:
+        return None
+    finally:
+        sys.exc_clear()

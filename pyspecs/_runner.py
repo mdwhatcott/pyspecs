@@ -2,7 +2,6 @@ import importlib
 import os
 import time
 import StringIO
-import sys
 import traceback
 
 
@@ -37,12 +36,9 @@ class _StepRunner(object):
     def _import(self, name):
         try:
             importlib.import_module(name)
-            self._prepare_for_subsequent_runs(name)
         except (ImportError, NotImplementedError):
+            print traceback.format_exc()
             return
-
-    def _prepare_for_subsequent_runs(self, name):
-        del sys.modules[name]
 
 
 class ConsoleReporter(object):
@@ -189,6 +185,7 @@ class _StepCounter(object):
         self.steps = []
 
     def start(self, name):
+        # print 'starting counter...'
         report = _StepReport(name)
         self._associate_report(report, self.current_step is None)
         report.started = self.timer()
@@ -203,6 +200,7 @@ class _StepCounter(object):
         self.current_step = report
 
     def finish(self):
+        # print 'finishing counter...'
         self.current_step.finished = self.timer()
         if self.current_step.parent is None:
             self.reporter.report(self.current_step)
@@ -243,10 +241,12 @@ class _Step(object):
         return self
 
     def __enter__(self):
+        # print 'starting stuff...'
         self._counter.start(self.name)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # print 'ending stuff...'
         if exc_type is None:
             self._counter.finish()
 

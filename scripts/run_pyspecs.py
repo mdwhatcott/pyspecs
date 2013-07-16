@@ -1,18 +1,15 @@
 #!python
 
-# The purpose of this file is to mirror the functionality in the 'pyspecs'
-# script but with the .py extension, making it easier for use within the
-# PyCharm IDE on the Windows platform.
-
 
 import os
+import subprocess
+import sys
 import time
-from pyspecs._runner import _step_runner
 
 
 def _idle():
     working = os.path.abspath(os.getcwd())
-    print 'working:', working
+    sys.path.append(working)
     repetitions = 0
     state = 0
     while True:
@@ -20,7 +17,7 @@ def _idle():
         if state != new_state:
             repetitions += 1
             _display_repetitions_banner(repetitions)
-            _step_runner.load_steps(working)
+            subprocess.call(['python -m pyspecs'])
             state = new_state
         time.sleep(.75)
 
@@ -35,8 +32,13 @@ def _checksums(working):
 
 def _display_repetitions_banner(repetitions):
     number = ' {} '.format(repetitions)
-    half_delimiter = '=' * ((80 - len(number)) / 2)
+    half_delimiter = (EVEN if not repetitions % 2 else ODD) * \
+                     ((80 - len(number)) / 2)
     print '\n{0}{1}{0}\n'.format(half_delimiter, number)
+
+
+EVEN = '='
+ODD = '-'
 
 
 if __name__ == '__main__':
