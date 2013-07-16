@@ -1,6 +1,6 @@
 from itertools import count
 from unittest import TestCase
-from pyspecs._runner import _StepCounter, _Step
+from pyspecs._runner import _StepCounter, Step
 
 
 class FakeReporter(object):
@@ -16,7 +16,7 @@ class TestSingleStep(TestCase):
         timer = count()
         reporter = FakeReporter()
         counter = _StepCounter(reporter, timer.next)
-        given = _Step('given', counter)
+        given = Step('given', counter)
 
         with given.something:
             pass
@@ -35,9 +35,9 @@ class TestNestedStep(TestCase):
         timer = count()
         reporter = FakeReporter()
         counter = _StepCounter(reporter, timer.next)
-        given = _Step('given', counter)
-        when = _Step('when', counter)
-        then = _Step('then', counter)
+        given = Step('given', counter)
+        when = Step('when', counter)
+        then = Step('then', counter)
 
         with given.something:
             with when.cause:
@@ -76,7 +76,7 @@ class TestStepFailure(TestCase):
         timer = count()
         reporter = FakeReporter()
         counter = _StepCounter(reporter, timer.next)
-        given = _Step('given', counter)
+        given = Step('given', counter)
 
         with given.something:
             assert timer is None
@@ -98,7 +98,7 @@ class TestStepError(TestCase):
         timer = count()
         reporter = FakeReporter()
         counter = _StepCounter(reporter, timer.next)
-        given = _Step('given', counter)
+        given = Step('given', counter)
 
         with given.something:
             int('hi')

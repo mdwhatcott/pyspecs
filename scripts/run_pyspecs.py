@@ -2,7 +2,6 @@
 
 
 import os
-import subprocess
 import sys
 import time
 
@@ -17,7 +16,7 @@ def _idle():
         if state != new_state:
             repetitions += 1
             _display_repetitions_banner(repetitions)
-            subprocess.call(['python -m pyspecs'])
+            os.system('python -m pyspecs')
             state = new_state
         time.sleep(.75)
 

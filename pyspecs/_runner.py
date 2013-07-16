@@ -6,6 +6,12 @@ import traceback
 
 
 class _StepRunner(object):
+    """
+    Imports all test files in the project scope. Specs within these files
+    should either be at the top level of the module or in a function or class
+    that is invoked from the top-level. This service is managed and invoked
+    by the framework.
+    """
     def __init__(self, reporter):
         self.reporter = reporter
 
@@ -42,6 +48,10 @@ class _StepRunner(object):
 
 
 class ConsoleReporter(object):
+    """
+    Makes sure spec steps and aggregated statistics are reported to the console.
+    This service is managed and invoked by the framework.
+    """
     def __init__(self):
         self._prepare_for_upcoming_run()
 
@@ -99,6 +109,11 @@ class ConsoleReporter(object):
 
 
 class _StepReport(object):
+    """
+    Each instance is a node in a doubly-linked tree, making aggregation of
+    formatting via recursion elegant. These instances are created and managed
+    by the framework.
+    """
     PASSED = ''            # no news is good news
     FAILED = 'X'           # ballot 'x'
     ERROR = 'E'            # fire
@@ -178,6 +193,15 @@ class _StepReport(object):
 
 
 class _StepCounter(object):
+    """
+    This service is responsible for:
+        - creation of individual steps and their resultant exceptions
+        - timing of individual steps
+        - maintaining the scope of the steps that make up a spec
+        - assigning the relations between steps (parent, children)
+
+    This service is managed and invoked by the framework.
+    """
     def __init__(self, reporter, timer):
         self.reporter = reporter
         self.timer = timer
@@ -218,7 +242,18 @@ class _StepCounter(object):
         self.finish()
 
 
-class _Step(object):
+class Step(object):
+    """
+    Context-manager-based construct that houses the code that makes up
+    one of many dynamically named steps within a spec. While several default
+    steps are provided by the framework, developers may create others to suit
+    their grammatical constructs and tastes.
+
+    >>> by_the_way = Step('by the way', _counter)
+    >>> with by_the_way.this_framework_is_awesome:
+    ...     pass  # code for the step here...
+      | - by the way this framework is awesome
+    """
     def __init__(self, step, counter):
         self._step = step
         self._counter = counter

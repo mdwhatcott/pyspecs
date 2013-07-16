@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pyspecs._runner import _Step
+from pyspecs._runner import Step
 
 
 class FakeCounter(object):
@@ -25,7 +25,7 @@ class FakeCounter(object):
 class test_giving_a_step_a_name(TestCase):
     def setUp(self):
         self.counter = FakeCounter()
-        step = _Step('my step', self.counter).is_awesome
+        step = Step('my step', self.counter).is_awesome
         self.name = step.name
 
     def test_name_is_prettified_with_the_step_type(self):
@@ -41,7 +41,7 @@ class test_giving_a_step_a_name(TestCase):
 class TestOneNamingOnly(TestCase):
     def setUp(self):
         self.counter = FakeCounter()
-        self.step = _Step('my step', self.counter).is_awesome
+        self.step = Step('my step', self.counter).is_awesome
 
     def test_additional_names_are_prohibited(self):
         self.assertRaises(AttributeError, lambda: self.step.blah)
@@ -50,7 +50,7 @@ class TestOneNamingOnly(TestCase):
 class TestEnterScope(TestCase):
     def setUp(self):
         self.counter = FakeCounter()
-        self.step = _Step('my step', self.counter).is_awesome
+        self.step = Step('my step', self.counter).is_awesome
         self.name = self.step.name
 
     def test_should_start_the_counter_for_that_step(self):
@@ -63,7 +63,7 @@ class TestEnterScope(TestCase):
 class TestExitScope(TestCase):
     def setUp(self):
         self.counter = FakeCounter()
-        self.step = _Step('my step', self.counter).is_awesome
+        self.step = Step('my step', self.counter).is_awesome
         self.name = self.step.name
 
     def test_success_should_finish_the_counter_for_that_step(self):
