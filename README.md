@@ -4,7 +4,7 @@ pyspecs - Minimalistic BDD in Python
 pyspecs is a testing framework that strives to achieve more readable
 specifications (tests) by leveraging some fancy syntactic sugar and
 auto-discovery of tests/specs.  WARNING: version 2.0 introduces breaking
-changes if you've been using 1.0 or 1.1 (.
+changes if you've been using 1.0 or 1.1.
 
 Installation is straightforward:
 
