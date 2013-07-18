@@ -44,7 +44,6 @@ class _StepRunner(object):
             importlib.import_module(name)
         except (ImportError, NotImplementedError):
             print traceback.format_exc()
-            return
 
 
 class ConsoleReporter(object):
