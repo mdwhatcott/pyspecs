@@ -1,11 +1,3 @@
-# Done: setup.py
-# Done: test installation and usage (bowling game)
-# Done: catalog bowling game example
-# TODO: documentation (README, readthedocs?)
-# TODO: decide on name and location on github
-# TODO: publish to pypi
-
-
 import sys
 from pyspecs._runner import Step, _counter, _step_runner
 from pyspecs._should import _Should
@@ -28,6 +20,7 @@ as_well_as = Step('as well as', _counter)
 the = _Should
 it = _Should
 this = _Should
+that = _Should
 
 
 # noinspection PyBroadException
