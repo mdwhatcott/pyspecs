@@ -8,7 +8,7 @@ setup(
     packages=['pyspecs'],
     scripts=['scripts/run_pyspecs.py'],
     url='https://github.com/mdwhatcott/pyspecs',
-    license='GPL',
+    license='MIT',
     author='Michael Whatcott',
     author_email='mdwhatcott+pyspecs@gmail.com',
     description='Concise BDD in python',
