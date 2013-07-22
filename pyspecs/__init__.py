@@ -1,9 +1,10 @@
 import sys
-from pyspecs._runner import Step, _counter, _step_runner
+from pyspecs._step import Step, _counter
+from pyspecs._runner import _step_runner
 from pyspecs._should import _Should
 
 
-__version__ = '2.0'
+__version__ = '2.1'
 
 
 given = Step('given', _counter)

@@ -1,6 +1,6 @@
 from itertools import count
 from unittest import TestCase
-from pyspecs._runner import _StepCounter, Step
+from pyspecs._step import _StepCounter, Step
 
 
 class FakeReporter(object):

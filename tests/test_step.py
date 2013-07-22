@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pyspecs._runner import Step
+from pyspecs._step import Step
 
 
 class FakeCounter(object):
