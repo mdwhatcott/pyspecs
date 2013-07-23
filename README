@@ -117,6 +117,9 @@ To begin an auto-test loop (runs all specs anytime a .py file is saved):
     $ run_pyspecs.py
 
 
+To run all tests once:
+
+    $ pyspecs_.py  # note the trailing underscore
 
 ### Complete Example
 
