@@ -133,7 +133,7 @@ class _StepReport(object):
         if not self.traceback:
             return ''
 
-        trace_indent = indent + (' ' * 4)
+        trace_indent = indent + (' ' * 6)
         template = '. |{0}{{0}}\n'.format(trace_indent)
         raw_trace = traceback.format_tb(self.traceback)
         total_trace = StringIO.StringIO()
@@ -145,7 +145,7 @@ class _StepReport(object):
 
         total_trace.write(template.format(self._format_exception_message()))
 
-        return total_trace.getvalue() + self._collect_captured_output()
+        return total_trace.getvalue() + self._collect_captured_output() + '\n'
 
     def _format_exception_message(self):
         error = self.error or self.failure

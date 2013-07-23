@@ -1,7 +1,6 @@
 import importlib
 import os
 import traceback
-import sys
 
 
 class _StepRunner(object):
