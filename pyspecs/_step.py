@@ -26,7 +26,7 @@ class _StepCounter(object):
     def _associate_report(self, report, top_level):
         if top_level:
             self.steps.append(report)
-        else:  # ? Is a context manager at the same scope as another a child?
+        else:
             self.current_step.children.append(report)
             report.parent = self.current_step
 
@@ -59,7 +59,7 @@ class Step(object):
     steps are provided by the framework, developers may create others to suit
     their grammatical constructs and tastes.
 
-    >>> from pyspecs._step import _counter
+    >>> from pyspecs_._step import _counter
     >>> by_the_way = Step('by the way', _counter)
     >>> with by_the_way.this_framework_is_awesome:
     ...     pass  # code for the step here...
