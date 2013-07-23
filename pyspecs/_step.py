@@ -1,5 +1,5 @@
-import time
-from pyspecs._reporting import _StepReport, _reporter
+import sys
+from pyspecs._reporting import _StepReport
 
 
 class _StepCounter(object):
@@ -20,6 +20,7 @@ class _StepCounter(object):
 
     def start(self, name):
         report = _StepReport(name)
+        sys.stdout = report
         self._associate_report(report, self.current_step is None)
         report.started = self.timer()
 
@@ -38,6 +39,7 @@ class _StepCounter(object):
             self.reporter.report(self.current_step)
 
         self.current_step = self.current_step.parent
+        sys.stdout = sys.__stdout__
 
     def error(self, exception_type, exception, traceback):
         self.current_step.error_type = exception_type
@@ -59,7 +61,7 @@ class Step(object):
     steps are provided by the framework, developers may create others to suit
     their grammatical constructs and tastes.
 
-    >>> from pyspecs_._step import _counter
+    >>> from pyspecs import _counter
     >>> by_the_way = Step('by the way', _counter)
     >>> with by_the_way.this_framework_is_awesome:
     ...     pass  # code for the step here...
@@ -103,6 +105,3 @@ class Step(object):
 
         self._name = None
         return True
-
-
-_counter = _StepCounter(_reporter, time.time)

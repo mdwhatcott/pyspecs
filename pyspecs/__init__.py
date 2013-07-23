@@ -1,10 +1,18 @@
+import os
 import sys
-from pyspecs._step import Step, _counter
-from pyspecs._runner import _step_runner
+import time
+from pyspecs._reporting import ConsoleReporter
+from pyspecs._runner import _StepRunner
 from pyspecs._should import _Should
+from pyspecs._step import Step, _StepCounter
 
 
 __version__ = '2.1'
+
+
+_reporter = ConsoleReporter()
+_counter = _StepCounter(_reporter, time.time)
+_step_runner = _StepRunner(_reporter)
 
 
 given = Step('given', _counter)
@@ -38,3 +46,13 @@ def catch(callable_):
         return None
     finally:
         sys.exc_clear()
+
+
+def main():
+    working = os.getcwd()
+    sys.path.append(working)
+    _step_runner.load_steps(working)
+
+
+if __name__ == '__main__':
+    main()

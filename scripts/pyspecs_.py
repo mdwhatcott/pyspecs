@@ -1,4 +1,7 @@
-from pyspecs.__main__ import main
+#!python
+
+
+from pyspecs import main
 
 
 if __name__ == '__main__':

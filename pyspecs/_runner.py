@@ -1,7 +1,7 @@
 import importlib
 import os
 import traceback
-from pyspecs._reporting import _reporter
+import sys
 
 
 class _StepRunner(object):
@@ -43,6 +43,3 @@ class _StepRunner(object):
             importlib.import_module(name)
         except (ImportError, NotImplementedError):
             print traceback.format_exc()
-
-
-_step_runner = _StepRunner(_reporter)

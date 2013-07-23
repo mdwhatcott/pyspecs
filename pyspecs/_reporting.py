@@ -1,5 +1,6 @@
 import StringIO
 import traceback
+import sys
 
 
 class ConsoleReporter(object):
@@ -8,7 +9,15 @@ class ConsoleReporter(object):
     This service is managed and invoked by the framework.
     """
     def __init__(self):
+        self.out = sys.__stdout__
         self._prepare_for_upcoming_run()
+        self.captured = StringIO.StringIO()
+
+    def write(self, captured):
+        self.captured.write(captured)
+
+    def _print(self, object_, newline='\n'):
+        self.out.write(str(object_) + newline)
 
     def _prepare_for_upcoming_run(self):
         self._total_duration = 0
@@ -32,7 +41,7 @@ class ConsoleReporter(object):
         if all_passed < all_steps:
             self._problem_reports.append(step_report)
         else:
-            print step_report
+            self._print(step_report)
 
     def _tally(self, report, selector):
         total = bool(selector(report))
@@ -46,19 +55,21 @@ class ConsoleReporter(object):
 
     def aggregate(self):
         if self._problem_reports:
-            print '\n******* Problem Scenarios *******\n'
+            self._print('\n******* Problem Scenarios *******\n')
         for problem in self._problem_reports:
             print problem
 
         duration = round(self._total_duration, 4)
         if not self._failures and not self._errors:
-            print 'ok ({0} steps, {1} scenarios in {2} seconds)'.format(
-                self._steps, self._scenarios, duration)
+            self._print(
+                '{0} steps, {1} scenarios in {2} seconds\n\nok'.format(
+                    self._steps, self._scenarios, duration))
         else:
-            print '{0} passed, {1} failed, {2} errors ' \
-                  '({3} steps, {4} scenarios in {5} seconds)'.format(
-                  self._passed, self._failures, self._errors,
-                  self._steps, self._scenarios, duration)
+            self._print(
+                '{0} passed, {1} failed, {2} errors '
+                '({3} steps, {4} scenarios in {5} seconds)'.format(
+                    self._passed, self._failures, self._errors,
+                    self._steps, self._scenarios, duration))
 
         self._prepare_for_upcoming_run()
 
@@ -87,6 +98,10 @@ class _StepReport(object):
         self.failure = None
         self.error = None
         self.traceback = None
+        self.captured_output = StringIO.StringIO()
+
+    def write(self, value):
+        self.captured_output.write(str(value))
 
     @property
     def duration(self):
@@ -108,20 +123,11 @@ class _StepReport(object):
         status = self.PASSED if self.traceback is None else (
             self.FAILED if self.error is None else self.ERROR)
         indent = self.INDENT * level
-        name = self._format_step_name()
-        trace = self._format_traceback(indent)
         duration = self._measure_duration()
+        trace = self._format_traceback(indent)
 
         return u'{0:2}|{1} {2} {3} {4}\n{5}'.format(
-            status, indent, self.LIST_ITEM, name, duration, trace)
-
-    def _format_step_name(self):
-        if not self.traceback:
-            return self.name
-
-        error = self.error or self.failure
-        return self.name + ' <----{0}: {1}---->'.format(
-            error.__class__.__name__, error.message).rstrip()
+            status, indent, self.LIST_ITEM, self.name, duration, trace)
 
     def _format_traceback(self, indent):
         if not self.traceback:
@@ -132,12 +138,19 @@ class _StepReport(object):
         raw_trace = traceback.format_tb(self.traceback)
         total_trace = StringIO.StringIO()
 
-        for t in raw_trace:
+        for t in reversed(raw_trace):
             line_number, code = t.strip().split('\n')
             total_trace.write(template.format(line_number))
             total_trace.write(template.format(code))
 
-        return total_trace.getvalue()
+        total_trace.write(template.format(self._format_exception_message()))
+
+        return total_trace.getvalue() + self._collect_captured_output()
+
+    def _format_exception_message(self):
+        error = self.error or self.failure
+        return '{0}: {1}'.format(
+            error.__class__.__name__, error.message).rstrip()
 
     def _measure_duration(self):
         duration = round(self.duration, 2)
@@ -146,5 +159,11 @@ class _StepReport(object):
         else:
             return ' (* {0} seconds *)'.format(duration)
 
+    def _collect_captured_output(self):
+        output = self.captured_output.getvalue()
+        if not output:
+            return output
 
-_reporter = ConsoleReporter()
+        top_border = ('=' * 31) + ' Captured Output ' + ('=' * 31)
+        bottom_border = '=' * 79
+        return '\n{0}\n{1}\n{2}'.format(top_border, output, bottom_border)
