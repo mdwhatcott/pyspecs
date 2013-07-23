@@ -1,5 +1,6 @@
 # coding=utf-8
 
+
 """
 This file is divided into 3 segments:
 
@@ -40,9 +41,11 @@ This file is divided into 3 segments:
   |     • then the score should equal 300
 
 
-ok (15 steps, 5 scenarios in 0.0002 seconds)
-"""
+15 steps, 5 scenarios in 0.0002 seconds
 
+ok
+
+"""
 
 ########## Production Code ###########
 
