@@ -41,18 +41,8 @@ def catch(callable_):
     try:
         callable_()
     except:
-        return sys.exc_info()
+        return sys.exc_info()[1]
     else:
         return None
     finally:
         sys.exc_clear()
-
-
-def main():
-    working = os.getcwd()
-    sys.path.append(working)
-    _step_runner.load_steps(working)
-
-
-if __name__ == '__main__':
-    main()
