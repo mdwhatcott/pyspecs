@@ -141,7 +141,7 @@ BE_A = "to be a {1} (was a {2})."
 EQUAL = "to equal '{1}'."
 BE_EMPTY = "to be empty."
 PREPARATION_ERROR = 'You must add calls to .should and .NOT in '\
-    'order execute an assertion!'
+    'order to execute an assertion!'
 EXPECTED = "Expected '{0}' "
 UNEXPECTED = EXPECTED + "NOT "
 
