@@ -63,7 +63,7 @@ class ConsoleReporter(object):
         duration = round(self._total_duration, 4)
         if not self._failures and not self._errors:
             self._print(
-                '{0} steps, {1} scenarios in {2} seconds\n\nok'.format(
+                '{0} steps, {1} scenarios in {2} seconds\n\nok\n'.format(
                     self._steps, self._scenarios, duration))
         else:
             self._print(
