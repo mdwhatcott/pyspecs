@@ -6,7 +6,7 @@ from pyspecs._should import _Should
 from pyspecs._step import Step, _StepCounter
 
 
-__version__ = '2.1'
+__version__ = '2.2'
 
 
 _reporter = ConsoleReporter()
