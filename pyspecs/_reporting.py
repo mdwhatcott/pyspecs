@@ -150,8 +150,10 @@ class _StepReport(object):
 
     def _format_exception_message(self):
         error = self.error or self.failure
-        return '{0}: {1}'.format(
-            error.__class__.__name__, error.message).rstrip()
+        return '{0} ({1}): {2}'.format(
+            error.__class__.__name__,
+            error,
+            error.message or '<blank message>').rstrip()
 
     def _measure_duration(self):
         duration = round(self.duration, 2)
