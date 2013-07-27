@@ -18,6 +18,7 @@ class ConsoleReporter(object):
 
     def _print(self, object_, newline='\n'):
         self.out.write(str(object_) + newline)
+        self.out.flush()
 
     def _prepare_for_upcoming_run(self):
         self._total_duration = 0

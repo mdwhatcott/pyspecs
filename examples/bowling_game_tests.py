@@ -105,7 +105,7 @@ def roll_game(rolls):
     return game
 
 
-from pyspecs import given, when, then, the
+from pyspecs import given, when, then, the, finish
 
 
 with given.a_game_with_all_gutter_balls:
@@ -156,3 +156,7 @@ with given.a_perfect_game:
 
         with then.the_score_should_equal_300:
             the(score).should.equal(300)
+
+
+if __name__ == '__main__':
+    finish()

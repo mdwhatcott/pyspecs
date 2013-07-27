@@ -1,4 +1,3 @@
-import os
 import sys
 import time
 from pyspecs._reporting import ConsoleReporter
@@ -46,3 +45,16 @@ def catch(callable_):
         return None
     finally:
         sys.exc_clear()
+
+
+def finish():
+    """
+    Call this method from your test script after all scenarios like so:
+
+    if __name__ == '__main__':
+        pyspecs.finish()
+
+    This allows you to invoke your test file as a main module, limiting
+    the scenarios executed to those in the file in question.
+    """
+    _reporter.aggregate()

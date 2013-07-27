@@ -1,4 +1,4 @@
-from pyspecs import given, when, then, and_, the, this
+from pyspecs import given, when, then, and_, the, this, finish
 
 
 with given.two_operands:
@@ -47,3 +47,7 @@ with when.there_are_several_asserts:
         this(False).should.equal(True)
     with then.the_third_has_an_error:
         this(int('asdf')).should_NOT.be_an(int)
+
+
+if __name__ == '__main__':
+    finish()
