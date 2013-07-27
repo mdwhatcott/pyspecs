@@ -1,3 +1,10 @@
+"""
+Because I always forget, here's how to submit to PyPI:
+
+# python setup.py register sdist upload
+
+"""
+
 from distutils.core import setup
 import pyspecs
 
