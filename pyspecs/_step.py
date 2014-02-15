@@ -86,6 +86,12 @@ class Step(object):
         self._name = item
         return self
 
+    def __call__(self, *args):
+        if len(args) != 1:
+            raise AttributeError('You may only specify a single name')
+        self._name = ''.join([x if ord(x) < 128 else '-' for x in args[0]])
+        return self
+
     def __enter__(self):
         self._counter.start(self.name)
         return self
