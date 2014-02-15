@@ -1,7 +1,11 @@
-import StringIO
-import traceback
 import sys
-
+import traceback
+if sys.version < '3':
+    from StringIO import StringIO
+else:
+    from io import StringIO
+    unichr = chr
+    unicode = str
 
 class ConsoleReporter(object):
     """
@@ -11,13 +15,13 @@ class ConsoleReporter(object):
     def __init__(self):
         self.out = sys.__stdout__
         self._prepare_for_upcoming_run()
-        self.captured = StringIO.StringIO()
+        self.captured = StringIO()
 
     def write(self, captured):
         self.captured.write(captured)
 
     def _print(self, object_, newline='\n'):
-        self.out.write(str(object_) + newline)
+        self.out.write(unicode(object_) + newline)
         self.out.flush()
 
     def _prepare_for_upcoming_run(self):
@@ -58,7 +62,7 @@ class ConsoleReporter(object):
         if self._problem_reports:
             self._print('\n******* Problem Scenarios *******\n')
         for problem in self._problem_reports:
-            print problem
+            print(problem)
 
         duration = round(self._total_duration, 4)
         if not self._failures and not self._errors:
@@ -81,11 +85,11 @@ class _StepReport(object):
     formatting via recursion elegant. These instances are created and managed
     by the framework.
     """
-    PASSED = ''            # no news is good news
-    FAILED = 'X'           # ballot 'x'
-    ERROR = 'E'            # fire
-    SKIPPED = 'S'          # white flag
-    LIST_ITEM = u'\u2022'  # bullet
+    PASSED = ''           # no news is good news
+    FAILED = 'X'          # ballot 'x'
+    ERROR = 'E'           # fire
+    SKIPPED = 'S'         # white flag
+    LIST_ITEM = unichr(0x2022) # bullet
     INDENT = '  '
 
     def __init__(self, name):
@@ -99,7 +103,7 @@ class _StepReport(object):
         self.failure = None
         self.error = None
         self.traceback = None
-        self.captured_output = StringIO.StringIO()
+        self.captured_output = StringIO()
 
     def write(self, value):
         self.captured_output.write(str(value))
@@ -112,9 +116,9 @@ class _StepReport(object):
         return self._format(0) + '\n'
 
     def _format(self, level):
-        builder = StringIO.StringIO()
+        builder = StringIO()
         message = self._compose_message(level)
-        builder.write(message.encode('utf-8'))
+        builder.write(message)
         for c in self.children:
             builder.write(c._format(level + 1))
 
@@ -127,7 +131,7 @@ class _StepReport(object):
         duration = self._measure_duration()
         trace = self._format_traceback(indent)
 
-        return u'{0:2}|{1} {2} {3} {4}\n{5}'.format(
+        return unicode('{0:2}|{1} {2} {3} {4}\n{5}').format(
             status, indent, self.LIST_ITEM, self.name, duration, trace)
 
     def _format_traceback(self, indent):
@@ -137,7 +141,7 @@ class _StepReport(object):
         trace_indent = indent + (' ' * 6)
         template = '. |{0}{{0}}\n'.format(trace_indent)
         raw_trace = traceback.format_tb(self.traceback)
-        total_trace = StringIO.StringIO()
+        total_trace = StringIO()
 
         for t in reversed(raw_trace):
             line_number, code = t.strip().split('\n')

@@ -15,7 +15,7 @@ class TestSingleStep(TestCase):
     def test(self):
         timer = count()
         reporter = FakeReporter()
-        counter = _StepCounter(reporter, timer.next)
+        counter = _StepCounter(reporter, timer.next if hasattr(timer, 'next') else timer.__next__)
         given = Step('given', counter)
 
         with given.something:
@@ -34,7 +34,7 @@ class TestNestedStep(TestCase):
     def test(self):
         timer = count()
         reporter = FakeReporter()
-        counter = _StepCounter(reporter, timer.next)
+        counter = _StepCounter(reporter, timer.next if hasattr(timer, 'next') else timer.__next__)
         given = Step('given', counter)
         when = Step('when', counter)
         then = Step('then', counter)
@@ -75,7 +75,7 @@ class TestStepFailure(TestCase):
     def test(self):
         timer = count()
         reporter = FakeReporter()
-        counter = _StepCounter(reporter, timer.next)
+        counter = _StepCounter(reporter, timer.next if hasattr(timer, 'next') else timer.__next__)
         given = Step('given', counter)
 
         with given.something:
@@ -97,7 +97,7 @@ class TestStepError(TestCase):
     def test(self):
         timer = count()
         reporter = FakeReporter()
-        counter = _StepCounter(reporter, timer.next)
+        counter = _StepCounter(reporter, timer.next if hasattr(timer, 'next') else timer.__next__)
         given = Step('given', counter)
 
         with given.something:

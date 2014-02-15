@@ -91,7 +91,7 @@ class TestExitScope(TestCase):
         exception_type, exception, traceback = self.counter.failures[0]
         self.assertEqual(exception_type, type(AssertionError()))
         self.assertIsNotNone(exception)
-        self.assertIn('blah blah', exception.message)
+        self.assertIn('blah blah', str(exception))
         self.assertIsNotNone(traceback)
 
     def test_error_should_log_error(self):
@@ -107,7 +107,7 @@ class TestExitScope(TestCase):
         exception_type, exception, traceback = self.counter.errors[0]
         self.assertEqual(exception_type, type(ZeroDivisionError()))
         self.assertIsNotNone(exception)
-        self.assertIn('blah blah blah', exception.message)
+        self.assertIn('blah blah blah', str(exception))
         self.assertIsNotNone(traceback)
 
     def test_keyboard_interrupt_can_halt_execution(self):
