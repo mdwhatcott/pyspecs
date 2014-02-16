@@ -20,6 +20,26 @@ This file is divided into 3 segments:
    that the Production Code is correct.
 
 ########### 1. Sample Output ###########
+
+  | • given the number 2, which is not divisible by 3 nor 5 
+  |   • when the function is called 
+  |   • then the result is the same number 
+
+
+  | • given the number 3, which is divisible by 3 but not by 5 
+  |   • when the function is called 
+  |   • then the result is the same number 
+
+
+  | • given the number 5, which is divisible by 5 but not by 3 
+  |   • when the function is called 
+  |   • then the result is the same number 
+
+
+  | • given the number 15, which is divisible by 3 and 5 
+  |   • when the function is called 
+  |   • then the result is the same number 
+
 """
 
 
