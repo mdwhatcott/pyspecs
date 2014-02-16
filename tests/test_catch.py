@@ -14,7 +14,7 @@ class TestCatch(TestCase):
 
         info = catch(throw)
         self.assertIsInstance(info, ZeroDivisionError)
-        self.assertEqual('No can do!', info.message)
+        self.assertEqual('No can do!', str(info))
 
     def test_exception_info_reset(self):
         def throw():
