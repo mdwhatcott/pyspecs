@@ -1,7 +1,7 @@
 pyspecs - Minimalistic BDD in Python
 ====================================
 
-[build](https://travis-ci.org/mdwhatcott/pyspecs.png)
+![Build Status](https://travis-ci.org/mdwhatcott/pyspecs.png)
 
 pyspecs is a testing framework that strives to achieve more readable
 specifications (tests) by leveraging some fancy syntactic sugar and
