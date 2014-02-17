@@ -33,8 +33,9 @@ class TestShouldAssertions(TestCase):
         self._passes(lambda: this(self.lower).should.be_a(type(str())))
 
     def test_failing_should_be_a(self):
-        self._fails(lambda: this(self.lower).should.be_a(type(list())),
-            "Expected 'string' to be a <type 'list'> (was a <type 'str'>)."
+        self._fails(lambda: this(self.lower).should.be_a(list),
+                    "Expected 'string' to be a {1} (was a {0})."
+                    .format(str, list)
         )
 
     def test_passing_should_contain(self):
@@ -185,18 +186,18 @@ class TestShouldAssertions(TestCase):
     def _passes(self, action):
         try:
             action()
-        except AssertionError:
-            raise AssertionError('This test should have passed!')
+        except AssertionError as e:
+            raise AssertionError('This test should have passed, but exception launched:' + str(e))
 
     def _fails(self, action, report):
         try:
             action()
         except AssertionError as error:
-            assert error.message == report,\
+            assert str(error) == report,\
                 'Assertion failed as expected but ' \
                 'gave the wrong error message!' \
                 '\nExpected: "{0}"'.format(report) + \
-                '\nReceived: "{0}"'.format(error.message)
+                '\nReceived: "{0}"'.format(error)
         else:
             raise AssertionError('This should have failed ' +
                 'with this error message: {0}'.format(report))

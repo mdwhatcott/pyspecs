@@ -36,7 +36,10 @@ def catch(callable_):
     """
     Utility method for saving any exceptions raised from a callable.
     """
-    sys.exc_clear()
+    def exc_clear():
+        if sys.version < '3':
+            sys.exc_clear()
+    exc_clear()
     try:
         callable_()
     except:
@@ -44,7 +47,7 @@ def catch(callable_):
     else:
         return None
     finally:
-        sys.exc_clear()
+        exc_clear()
 
 
 def finish():

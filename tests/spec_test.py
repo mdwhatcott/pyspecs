@@ -36,7 +36,7 @@ with given.an_error_prone_situation:
 with given.an_assertion_error:
     with when.the_assertion_error_occurs:
         with then.the_error_should_be_displayed:
-            print "Hello, World!"
+            print("Hello, World!")
             this(True).should.equal(False)
 
 

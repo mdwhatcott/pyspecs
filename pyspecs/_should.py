@@ -96,9 +96,10 @@ class _Should(object):
             self._value()
 
         except exception as e:
-            if message is not None and message != e.message:
+            e_message = str(e)[1:-1] if str(e) else ''
+            if message is not None and message != e_message:
                 raise AssertionError(INCORRECT_EXCEPTION_MESSAGE.format(
-                    exception.__name__, message, e.message))
+                    exception.__name__, message, e_message))
 
         except Exception as e:
             raise AssertionError(INCORRECT_EXCEPTION.format(
