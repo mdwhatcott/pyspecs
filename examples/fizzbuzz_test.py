@@ -105,4 +105,4 @@ if __name__ == '__main__':
     import sys
     limit = sys.argv[1] if len(sys.argv) > 0 else 10
     for n in range(limit):
-        print fizzbuzz(limit+1)
+        print(fizzbuzz(limit+1))
