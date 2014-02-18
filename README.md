@@ -113,17 +113,17 @@ provides a command-line script into the environment, meant to be invoked
 from the root of your project.  The script will execute all specs in .py files
 ending in 'test.py' or 'tests.py' or beginning with 'test'.
 
-To begin an auto-test loop (runs all specs anytime a .py file is saved):
-
+To run all tests once:
 
     $ run_pyspecs.py
 
+To begin an auto-test loop (runs all specs anytime a .py file is saved):
 
-To run all tests once:
 
-    $ pyspecs_.py  # note the trailing underscore
+    $ run_pyspecs.py -w
+
 
 ### Complete Example
 
-There's a complete example of specs, code, and output in the
+There are some complete examples of specs, code, and output in the
 [examples folder](https://github.com/mdwhatcott/pyspecs/tree/master/examples).

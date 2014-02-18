@@ -1,10 +1,22 @@
 import os
 import sys
 import time
+from pyspecs import _step_runner
 
 
-def main():
-    working = os.path.abspath(os.getcwd())
+def watch(path):
+    try:
+        _watch_loop(path)
+    except KeyboardInterrupt:
+        pass
+
+def run(path):
+    sys.path.append(path)
+    _step_runner.load_steps(path)
+
+def _watch_loop(path):
+    working = os.path.abspath(path)
+    os.chdir(working)
     sys.path.append(working)
     repetitions = 0
     state = 0
@@ -14,13 +26,14 @@ def main():
             repetitions += 1
             _display_repetitions_banner(repetitions)
             print 'Running tests...'
-            os.system('pyspecs_.py')
+            run(working)
             state = new_state
         time.sleep(.75)
 
-
 def _checksums(working):
     for root, dirs, files in os.walk(working):
+        if dirs.startswith('.'):
+            continue
         for f in files:
             if f.endswith('.py'):
                 stats = os.stat(os.path.join(root, f))
