@@ -62,7 +62,7 @@ class ConsoleReporter(object):
         if self._problem_reports:
             self._print('\n******* Problem Scenarios *******\n')
         for problem in self._problem_reports:
-            print(problem)
+            print(unicode(problem))
 
         duration = round(self._total_duration, 4)
         if not self._failures and not self._errors:
