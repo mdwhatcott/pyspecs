@@ -10,9 +10,6 @@ class _StepRunner(object):
     that is invoked from the top-level. This service is managed and invoked
     by the framework.
     """
-    def __init__(self, reporter):
-        self.reporter = reporter
-
     def load_steps(self, working):
         for root, dirs, files in os.walk(working):
             for f in files:
@@ -20,8 +17,6 @@ class _StepRunner(object):
                     name = self._derive_module_name(
                         os.path.join(root, f), working)
                     self._import(name)
-
-        self.reporter.aggregate()
 
     def _is_test_module(self, f):
         return f.endswith('test.py') or \

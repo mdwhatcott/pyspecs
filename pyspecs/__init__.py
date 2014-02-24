@@ -11,8 +11,8 @@ __version__ = '2.2'
 
 _reporter = ConsoleReporter()
 _counter = _StepCounter(_reporter, time.time)
-_step_runner = _StepRunner(_reporter)
-
+_step_runner = _StepRunner()
+_reporter.aggregate()
 
 given = Step('given', _counter)
 provided = Step('provided', _counter)

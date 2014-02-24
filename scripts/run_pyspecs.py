@@ -1,7 +1,12 @@
-#!python
-
+#!/usr/bin/env python
 
 import os
+import sys
+CURRENT_PATH = os.path.dirname(__file__)
+PARENT_PATH = os.path.dirname(CURRENT_PATH)
+sys.path.append(CURRENT_PATH)
+sys.path.append(PARENT_PATH)
+
 import argparse
 from pyspecs import _idle
 
