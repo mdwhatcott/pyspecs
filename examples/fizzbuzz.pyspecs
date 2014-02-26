@@ -58,9 +58,6 @@ def fizzbuzz(n):
 
 ############## Test Code ###############
 
-from pyspecs import given, when, then, the, finish
-
-
 with given('the number 2, which is not divisible by 3 nor 5'):
     number = 2
 

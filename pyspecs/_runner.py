@@ -1,6 +1,8 @@
-import importlib
 import os
-import traceback
+import logging
+log = logging.getLogger(__name__)
+
+from .framework import framework
 
 
 class _StepRunner(object):
@@ -10,30 +12,19 @@ class _StepRunner(object):
     that is invoked from the top-level. This service is managed and invoked
     by the framework.
     """
-    def load_steps(self, working):
+    def load_steps(self, working, registry):
         for root, dirs, files in os.walk(working):
             for f in files:
                 if self._is_test_module(f):
-                    name = self._derive_module_name(
-                        os.path.join(root, f), working)
-                    self._import(name)
+                    path = os.path.join(root, f)
+                    self._exec_in(path, registry)
 
     def _is_test_module(self, f):
-        return f.endswith('test.py') or \
-            f.endswith('tests.py') or \
-            (f.startswith('test') and f.endswith('.py'))
+        return f.endswith('.pyspecs')
 
-    # noinspection PyArgumentList
-    def _derive_module_name(self, path, working):
-        common = os.path.commonprefix([working, path])
-        slice_module_name = slice(len(common) + 1, len(path))
-        return path[slice_module_name] \
-            .replace('.py', '') \
-            .replace('\\', '.') \
-            .replace('/', '.')
+    def _exec_in(self, path, registry):
+        log.debug('Procesing file %s', path)
 
-    def _import(self, name):
-        try:
-            importlib.import_module(name)
-        except (ImportError, NotImplementedError):
-            print(traceback.format_exc())
+        config = framework(registry)
+        execfile(path, config)
+        return config

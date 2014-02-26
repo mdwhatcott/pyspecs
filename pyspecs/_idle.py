@@ -1,20 +1,14 @@
 import os
 import sys
 import time
-from pyspecs import _step_runner
+from ._runner import _StepRunner
+from ._reporting import ConsoleReporter
+from ._registry import Registry
+from _decorators import wait_keyboard_interrupt
 
 
+@wait_keyboard_interrupt
 def watch(path):
-    try:
-        _watch_loop(path)
-    except KeyboardInterrupt:
-        pass
-
-def run(path):
-    sys.path.append(path)
-    _step_runner.load_steps(path)
-
-def _watch_loop(path):
     working = os.path.abspath(path)
     os.chdir(working)
     sys.path.append(working)
@@ -29,6 +23,19 @@ def _watch_loop(path):
             run(working)
             state = new_state
         time.sleep(.75)
+
+def run(path):
+    sys.path.append(path)
+
+    print 'running', path
+
+    registry = Registry()
+
+    step_runner = _StepRunner()
+    step_runner.load_steps(path, registry)
+
+    reporter = ConsoleReporter(registry)
+    reporter.render(step_runner)
 
 def _checksums(working):
     for root, dirs, files in os.walk(working):
