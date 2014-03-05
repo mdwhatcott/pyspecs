@@ -14,7 +14,7 @@ class _Should(object):
         return self
 
     @property
-    def should_NOT(self):
+    def should_not(self):
         self._invert = True
         self._expect = UNEXPECTED
         return self

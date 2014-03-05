@@ -1,165 +1,143 @@
-from unittest.case import TestCase
-from pyspecs._should import PREPARATION_ERROR, should_expectation
-from pyspecs import this
+from unittest.case import TestCase, skip
+from mock import Mock
+from pyspecs._should import _Should as this
+from pyspecs._should import should_expectation
+from pyspecs._should import PREPARATION_ERROR
+from pyspecs._step import Step, StepFactory
 
 
-class TestShouldAssertions(TestCase):
+class TestStepAssertions(TestCase):
     def setUp(self):
-        self.lower = 'string'
-        self.upper = 'STRING'
+        registry = Mock()
 
-    def test_asserting_before_proper_method_chaining_raises_error(self):
-        self._fails(lambda: this(self.lower).equal(self.lower),
-            PREPARATION_ERROR
-        )
+    def test_passing_when_equal(self):
+        this('foo').should.equal('foo')
 
-    def test_passing_should_equal(self):
-        self._passes(lambda: this(self.lower).should.equal(self.lower))
-
-    def test_failing_should_equal(self):
-        self._fails(lambda: this(self.lower).should.equal(self.upper),
-            "Expected 'string' to equal 'STRING'."
-        )
+    def test_failing_when_not_equal(self):
+        with self.assertRaises(AssertionError):
+            this('foo').should.equal('bar')
 
     def test_NOT_inverts_assertion_logic(self):
-        self._passes(lambda: this(self.lower).should_NOT.equal(self.upper))
+        this('foo').should_not.equal('bar')
+
+    def test_NOT_embellishes_syntax_error(self):
+        with self.assertRaises(AssertionError) as e:
+            this('foo').equal('foo')
+        self.assertEquals(PREPARATION_ERROR, str(e.exception))
 
     def test_NOT_embellishes_error_message_on_failure_accordingly(self):
-        self._fails(lambda: this(self.lower).should_NOT.equal(self.lower),
-            "Expected 'string' NOT to equal 'string'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this('foo').should_not.equal('foo')
+
+        self.assertEquals("Expected 'foo' NOT to equal 'foo'.", str(e.exception))
 
     def test_passing_should_be_a(self):
-        self._passes(lambda: this(self.lower).should.be_a(type(str())))
+        this('foo').should.be_a(str)
+
 
     def test_failing_should_be_a(self):
-        self._fails(lambda: this(self.lower).should.be_a(list),
-                    "Expected 'string' to be a {1} (was a {0})."
-                    .format(str, list)
-        )
+        with self.assertRaises(AssertionError) as e:
+            this('foo').should.be_a(list)
 
     def test_passing_should_contain(self):
-        self._passes(lambda: this(self.lower).should.contain(self.lower[0]))
+        this('foo').should.contain('o')
+
 
     def test_failing_should_contain(self):
-        self._fails(lambda: this(self.lower).should.contain('x'),
-            "Expected 'string' to contain 'x'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this('foo').should.contain('x')
 
     def test_passing_should_be_in(self):
-        self._passes(lambda: this(self.lower[0]).should.be_in(self.lower))
+        this('f').should.be_in('foo')
 
     def test_failing_should_be_in(self):
-        self._fails(lambda: this('x').should.be_in(self.lower),
-            "Expected 'x' to be in 'string'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this('x').should.be_in('foo')
 
     def test_passing_should_be_greater_than(self):
-        self._passes(lambda: this(1).should.be_greater_than(0))
+        this(1).should.be_greater_than(0)
 
     def test_failing_should_be_greater_than(self):
-        self._fails(lambda: this(0).should.be_greater_than(1),
-            "Expected '0' to be greater than '1'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this(0).should.be_greater_than(1)
 
     def test_passing_should_be_less_than(self):
-        self._passes(lambda: this(0).should.be_less_than(1))
+        this(0).should.be_less_than(1)
 
     def test_failing_should_be_less_than(self):
-        self._fails(lambda: this(1).should.be_less_than(0),
-            "Expected '1' to be less than '0'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this(1).should.be_less_than(0)
 
     def test_passing_should_be_greater_than_or_equal_to(self):
-        self._passes(lambda: this(0).should.be_greater_than_or_equal_to(0))
-        self._passes(lambda: this(1).should.be_greater_than_or_equal_to(0))
+        this(0).should.be_greater_than_or_equal_to(0)
+        this(1).should.be_greater_than_or_equal_to(0)
 
     def test_failing_should_be_greater_than_or_equal_to(self):
-        self._fails(lambda: this(0).should.be_greater_than_or_equal_to(1),
-            "Expected '0' to be greater than or equal to '1'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this(0).should.be_greater_than_or_equal_to(1)
 
     def test_passing_should_be_less_than_or_equal_to(self):
-        self._passes(lambda: this(0).should.be_less_than_or_equal_to(0))
-        self._passes(lambda: this(-1).should.be_less_than_or_equal_to(0))
+        this(0).should.be_less_than_or_equal_to(0)
+        this(-1).should.be_less_than_or_equal_to(0)
 
     def test_failing_should_be_less_than_or_equal_to(self):
-        self._fails(lambda: this(0).should.be_less_than_or_equal_to(-1),
-            "Expected '0' to be less than or equal to '-1'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this(0).should.be_less_than_or_equal_to(-1)
 
     def test_passing_should_be(self):
-        self._passes(lambda: this(True).should.be(True))
+        this(True).should.be(True)
 
     def test_failing_should_be(self):
-        self._fails(lambda: this(True).should.be(False),
-            "Expected 'True' to be 'False'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this(True).should.be(False)
 
     def test_passing_be_between(self):
-        self._passes(lambda: this(2).should.be_between(1, 3))
+        this(2).should.be_between(1, 3)
 
     def test_failing_be_between(self):
-        self._fails(lambda: this(1).should.be_between(2, 3),
-            "Expected '1' to be between '2' and '3'."
-        )
+        with self.assertRaises(AssertionError) as e:
+            this(1).should.be_between(2, 3)
 
     def test_raises_with_unspecified_message(self):
         def raise_():
             raise KeyError()
 
-        self._passes(lambda: this(raise_).should.raise_a(KeyError))
-        self._passes(lambda: this(raise_).should.raise_an(KeyError))
+        this(raise_).should.raise_a(KeyError)
+        this(raise_).should.raise_an(KeyError)
 
     def test_raises_no_error(self):
         def no_error():
             pass
 
-        self._fails(lambda: this(no_error).should.raise_a(Exception),
-            "'no_error' executed successfully but "
-            "should have raised 'Exception'!"
-        )
-        self._fails(lambda: this(no_error).should.raise_an(Exception),
-            "'no_error' executed successfully but "
-            "should have raised 'Exception'!"
-        )
+        with self.assertRaises(AssertionError):
+            this(no_error).should.raise_a(Exception)
+        with self.assertRaises(AssertionError):
+            this(no_error).should.raise_an(Exception)
 
     def test_raises_with_incorrect_error_message(self):
         def raise_():
             raise KeyError("Specific Error Message")
 
-        self._fails(lambda:
-            this(raise_).should.raise_a(KeyError, "Wrong Error Message"),
-                "Raised 'KeyError' as expected but "
-                "with an incorrect error message:\n"
-                "Expected: 'Wrong Error Message'\n"
-                "Received: 'Specific Error Message'"
-        )
-        self._fails(lambda:
-            this(raise_).should.raise_an(KeyError, "Wrong Error Message"),
-                "Raised 'KeyError' as expected but "
-                "with an incorrect error message:\n"
-                "Expected: 'Wrong Error Message'\n"
-                "Received: 'Specific Error Message'"
-        )
+        with self.assertRaises(AssertionError):
+            this(raise_).should.raise_a(KeyError, "Wrong Error Message")
+        with self.assertRaises(AssertionError):
+            this(raise_).should.raise_an(KeyError, "Wrong Error Message")
 
     def test_raises_with_correct_error_message(self):
         def raise_():
             raise KeyError("Message 123")
 
-        self._passes(
-            lambda: this(raise_).should.raise_a(KeyError, "Message 123"))
-        self._passes(
-            lambda: this(raise_).should.raise_an(KeyError, "Message 123"))
+        this(raise_).should.raise_a(KeyError, "Message 123")
+        this(raise_).should.raise_an(KeyError, "Message 123")
 
     def test_raises_incorrect_exception(self):
         def raise_():
             raise KeyError()
 
-        self._fails(lambda: this(raise_).should.raise_a(IndexError),
-            "Should have raised 'IndexError' but raised 'KeyError' instead.")
-        self._fails(lambda: this(raise_).should.raise_an(IndexError),
-            "Should have raised 'IndexError' but raised 'KeyError' instead.")
+        with self.assertRaises(AssertionError):
+            this(raise_).should.raise_a(IndexError)
+        with self.assertRaises(AssertionError):
+            this(raise_).should.raise_an(IndexError)
 
     def test_decorate_with_custom_assertion(self):
         def be_5(this):
@@ -168,36 +146,20 @@ class TestShouldAssertions(TestCase):
                 report=lambda: "'{0}' should equal '5'.".format(this._value)
             )
         should_expectation(be_5)
-        self._passes(lambda: this(5).should.be_5())
-        self._fails(lambda: this(4).should.be_5(), "'4' should equal '5'.")
+
+        this(5).should.be_5()
+        with self.assertRaises(AssertionError):
+            this(4).should.be_5()
 
     def test_passing_empty(self):
-        self._passes(lambda: this(list()).should.be_empty())
-        self._passes(lambda: this(str()).should.be_empty())
-        self._passes(lambda: this(dict()).should.be_empty())
-        self._passes(lambda: this(tuple()).should.be_empty())
-        self._passes(lambda: this(set()).should.be_empty())
+        this(list()).should.be_empty()
+        this(str()).should.be_empty()
+        this(dict()).should.be_empty()
+        this(tuple()).should.be_empty()
+        this(set()).should.be_empty()
 
     def test_failing_empty(self):
-        self._fails(lambda: this('asdf').should.be_empty(),
-            "Expected 'asdf' to be empty."
-        )
+        with self.assertRaises(AssertionError):
+            this('asdf').should.be_empty()
 
-    def _passes(self, action):
-        try:
-            action()
-        except AssertionError as e:
-            raise AssertionError('This test should have passed, but exception launched:' + str(e))
 
-    def _fails(self, action, report):
-        try:
-            action()
-        except AssertionError as error:
-            assert str(error) == report,\
-                'Assertion failed as expected but ' \
-                'gave the wrong error message!' \
-                '\nExpected: "{0}"'.format(report) + \
-                '\nReceived: "{0}"'.format(error)
-        else:
-            raise AssertionError('This should have failed ' +
-                'with this error message: {0}'.format(report))

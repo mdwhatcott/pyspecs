@@ -1,113 +1,143 @@
 import sys
-from pyspecs._reporting import _StepReport
+import time
+import logging
+log = logging.getLogger(__name__)
+if sys.version < '3':
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 
-class _StepCounter(object):
-    """
-    This service is responsible for:
-        - creation of individual steps and their resultant exceptions
-        - timing of individual steps
-        - maintaining the scope of the steps that make up a spec
-        - assigning the relations between steps (parent, children)
+class Result(object):
+    SUCCESS = 'success'
+    ERROR = 'error'
+    ERROR = 'error'
+    FAILURE = 'failure'
+    ABORT = 'abort'
+    NOT_EXECUTED = 'not executed'
+    CHILD_ERROR = 'child error'
 
-    This service is managed and invoked by the framework.
-    """
-    def __init__(self, reporter, timer):
-        self.reporter = reporter
-        self.timer = timer
-        self.current_step = None
-        self.steps = []
+    def __init__(self):
+        self.kind = self.NOT_EXECUTED
+        self.exc_type = None
+        self.exc_val = None
+        self.exc_tb = None
 
-    def start(self, name):
-        report = _StepReport(name)
-        sys.stdout = report
-        self._associate_report(report, self.current_step is None)
-        report.started = self.timer()
+    def set_exception(self, exc_type, exc_val, exc_tb):
+        self.exc_type = exc_type
+        self.exc_val = exc_val
+        self.exc_tb = exc_tb
 
-    def _associate_report(self, report, top_level):
-        if top_level:
-            self.steps.append(report)
+        if exc_type is None:
+            self.kind = self.SUCCESS
+        elif isinstance(exc_val, AssertionError):
+            self.kind = self.FAILURE
+        elif isinstance(exc_val, KeyboardInterrupt):
+            self.kind = self.ABORT
         else:
-            self.current_step.children.append(report)
-            report.parent = self.current_step
+            self.kind = self.ERROR
 
-        self.current_step = report
+    @property
+    def is_success(self):
+        return self.kind == self.SUCCESS
 
-    def finish(self):
-        self.current_step.finished = self.timer()
-        if self.current_step.parent is None:
-            self.reporter.report(self.current_step)
+    @property
+    def is_error(self):
+        return self.kind == self.ERROR
 
-        self.current_step = self.current_step.parent
-        sys.stdout = sys.__stdout__
+    @property
+    def is_failure(self):
+        return self.kind == self.FAILURE
 
-    def error(self, exception_type, exception, traceback):
-        self.current_step.error_type = exception_type
-        self.current_step.error = exception
-        self.current_step.traceback = traceback
-        self.finish()
+    @property
+    def is_abort(self):
+        return self.kind == self.ABORT
 
-    def fail(self, exception_type, exception, traceback):
-        self.current_step.failure_type = exception_type
-        self.current_step.failure = exception
-        self.current_step.traceback = traceback
-        self.finish()
+    @property
+    def has_children_errors(self):
+        return self.kind == self.CHILD_ERROR
+
+    def __str__(self):
+        return self.kind
 
 
 class Step(object):
-    """
-    Context-manager-based construct that houses the code that makes up
-    one of many dynamically named steps within a spec. While several default
-    steps are provided by the framework, developers may create others to suit
-    their grammatical constructs and tastes.
-
-    >>> from pyspecs import _counter
-    >>> by_the_way = Step('by the way', _counter)
-    >>> with by_the_way.this_framework_is_awesome:
-    ...     pass  # code for the step here...
-      | - by the way this framework is awesome
-    """
-    def __init__(self, step, counter):
-        self._step = step
-        self._counter = counter
-        self._name = None
+    def __init__(self, kind, name, registry, timer=time.time):
+        self.kind = kind
+        self.name = name
+        self.registry = registry
+        self.timer = timer
+        self.start = timer()
+        self.stop = None
+        self.parent = None
+        self.steps = []
+        self.result = Result()
+        self.previous_stdout = sys.stdout
+        self.stdout = StringIO()
 
     @property
-    def name(self):
-        return '{0} {1}'\
-            .format(self._step, self._name or '')\
-            .replace('_', ' ')\
-            .strip()
+    def duration(self):
+        return self.stop - self.start
 
-    def __getattr__(self, item):
-        if self._name is not None:
-            raise AttributeError('You may only specify a single name.')
+    @property
+    def output(self):
+        return (
+            self.stdout.buf +
+            ''.join([x.output for x in self.steps])
+            )
 
-        self._name = item
-        return self
+    def write(self, stream):
+        self.stdout.write(stream)
+
+    def __enter__(self):
+        log.debug('Entering in %s', self.name)
+        self.parent = self.registry.push(self)
+        sys.stdout = self.stdout
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop = self.timer()
+        log.debug('Exiting from %s with %s,%s,%s', self.name, exc_type, exc_val, exc_tb)
+
+        self.registry.pop()
+        sys.stdout = self.previous_stdout
+
+        self._set_result(exc_type, exc_val, exc_tb)
+        return True
+
+    def __str__(self):
+        return '%s %s' % (self.kind, self.name)
+
+    def _set_result(self, exc_type, exc_val, exc_tb):
+        if self.result.has_children_errors:
+            return
+        self.result.set_exception(exc_type, exc_val, exc_tb)
+        if self.result.is_abort:
+            log.debug('Aborting')
+            raise exc_val
+        if not self.result.is_success and self.parent:
+            log.debug('Sending error to parent')
+            self.parent.set_child_error()
+
+    def set_child_error(self):
+        self.result.kind = Result.CHILD_ERROR
+        if self.parent:
+            self.parent.set_child_error()
+
+
+class StepFactory(object):
+    def __init__(self, kind, registry):
+        self.kind = kind
+        self.registry = registry
+
+    def __getattr__(self, name):
+        return self._create_step(name)
 
     def __call__(self, *args):
         if len(args) != 1:
             raise AttributeError('You may only specify a single name')
-        self._name = ''.join([x if ord(x) < 128 else '-' for x in args[0]])
-        return self
+        name = ''.join([x if ord(x) < 128 else '-' for x in args[0]])
+        return self._create_step(name)
 
-    def __enter__(self):
-        self._counter.start(self.name)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is None:
-            self._counter.finish()
-
-        elif isinstance(exc_val, AssertionError):
-            self._counter.fail(exc_type, exc_val, exc_tb)
-
-        elif isinstance(exc_val, KeyboardInterrupt):
-            raise exc_val  # exit()?
-
-        else:
-            self._counter.error(exc_type, exc_val, exc_tb)
-
-        self._name = None
-        return True
+    def _create_step(self, name):
+        step = Step(self.kind, name.replace('_', ' '), self.registry)
+        return step

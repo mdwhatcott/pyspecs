@@ -1,128 +1,70 @@
-from unittest import TestCase
+from unittest import TestCase, skip
+from mock import Mock, MagicMock
+
 from pyspecs._step import Step
-
-
-class FakeCounter(object):
-    def __init__(self):
-        self.starts = []
-        self.finished = False
-        self.failures = []
-        self.errors = []
-
-    def start(self, name):
-        self.starts.append(name)
-
-    def finish(self):
-        self.finished = True
-
-    def error(self, exception_type, exception, traceback):
-        self.errors.append((exception_type, exception, traceback))
-
-    def fail(self, exception_type, exception, traceback):
-        self.failures.append((exception_type, exception, traceback))
 
 
 class test_giving_a_step_a_name(TestCase):
     def setUp(self):
-        self.counter = FakeCounter()
-        step = Step('my step', self.counter).is_awesome
-        self.name = step.name
+        self.kind = 'step kind'
+        self.name = 'step name'
+        registry = Mock()
+        step = Step(self.kind, self.name, registry)
 
-    def test_name_is_prettified_with_the_step_type(self):
-        self.assertTrue(self.name.startswith('my step'))
+        self.str_step = str(step)
 
-    def test_name_includes_the_trailing_description(self):
-        self.assertTrue(self.name.endswith('is awesome'))
+    def test_step_string_is_prettified_with_the_step_type(self):
+        self.assertTrue(self.str_step.startswith(self.kind))
 
-    def test_complete_name(self):
-        self.assertEqual('my step is awesome', self.name)
+    def test_step_string_includes_the_trailing_description(self):
+        self.assertIn(self.name, self.str_step)
 
-
-class TestOneNamingOnly(TestCase):
-    def setUp(self):
-        self.counter = FakeCounter()
-        self.step = Step('my step', self.counter).is_awesome
-
-    def test_additional_names_are_prohibited(self):
-        self.assertRaises(AttributeError, lambda: self.step.blah)
+    def test_complete_step_string(self):
+        self.assertEqual('%s %s' % (self.kind, self.name), self.str_step)
 
 
 class TestEnterScope(TestCase):
     def setUp(self):
-        self.counter = FakeCounter()
-        self.step = Step('my step', self.counter).is_awesome
-        self.name = self.step.name
+        self.registry = Mock()
+        self.registry.push = MagicMock(return_value=None)
 
-    def test_should_start_the_counter_for_that_step(self):
+        self.step = Step('kind', 'name', self.registry)
+
+    def test_should_register_that_step(self):
         with self.step:
-            pass
-
-        self.assertEqual(self.counter.starts[0], 'my step is awesome')
+            self.assertTrue(self.registry.push.called)
 
 
 class TestExitScope(TestCase):
     def setUp(self):
-        self.counter = FakeCounter()
-        self.step = Step('my step', self.counter).is_awesome
-        self.name = self.step.name
+        self.registry = Mock()
+        self.registry.push = MagicMock(return_value=None)
+        self.registry.pop = MagicMock(return_value=None)
+        self.step = Step('kind', 'name', self.registry)
 
-    def test_success_should_finish_the_counter_for_that_step(self):
-        try:
-            with self.step:
-                pass
-        except Exception as e:
-            raise AssertionError(
-                'No exception expected but received a {0}'.format(type(e)))
-        else:
-            pass
-
-        self.assertTrue(self.counter.finished)
-
-    def test_assertion_error_should_log_failure(self):
-        try:
-            with self.step:
-                assert self.step is None, 'blah blah'
-        except Exception as e:
-            raise AssertionError(
-                'No exception expected but received a {0}'.format(type(e)))
-        else:
-            pass
-
-        exception_type, exception, traceback = self.counter.failures[0]
-        self.assertEqual(exception_type, type(AssertionError()))
-        self.assertIsNotNone(exception)
-        self.assertIn('blah blah', str(exception))
-        self.assertIsNotNone(traceback)
-
-    def test_error_should_log_error(self):
-        try:
-            with self.step:
-                raise ZeroDivisionError('blah blah blah')
-        except Exception as e:
-            raise AssertionError(
-                'No exception expected but received a {0}'.format(type(e)))
-        else:
-            pass
-
-        exception_type, exception, traceback = self.counter.errors[0]
-        self.assertEqual(exception_type, type(ZeroDivisionError()))
-        self.assertIsNotNone(exception)
-        self.assertIn('blah blah blah', str(exception))
-        self.assertIsNotNone(traceback)
-
-    def test_keyboard_interrupt_can_halt_execution(self):
-        try:
-            with self.step:
-                raise KeyboardInterrupt()
-        except KeyboardInterrupt:
-            pass  # execution could be halted here.
-        else:
-            raise AssertionError('Should have caught a KeyboardInterrupt!')
-
-        self.assertEqual(0, len(self.counter.errors))
-
-    def test_exit_should_clear_the_description(self):
+    def test_success_should_call_pop_and_finish(self):
         with self.step:
             pass
+        self.assertTrue(self.registry.pop.called)
+        self.assertTrue(self.step.result.is_success)
 
-        self.assertEqual('my step', self.step.name)
+    def test_assertion_error_should_log_failure(self):
+        with self.step:
+            assert False, 'reason'
+
+        self.assertTrue(self.registry.pop.called)
+        self.assertTrue(self.step.result.is_failure)
+
+    def test_error_should_log_error(self):
+        with self.step:
+            raise ZeroDivisionError('Fake zero division')
+
+        self.assertTrue(self.registry.pop.called)
+        self.assertTrue(self.step.result.is_error)
+
+    def test_keyboard_interrupt_can_halt_execution(self):
+        with self.assertRaises(KeyboardInterrupt):
+            with self.step:
+                raise KeyboardInterrupt()
+
+        self.assertTrue(self.step.result.is_abort)
