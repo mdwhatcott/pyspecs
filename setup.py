@@ -13,7 +13,7 @@ setup(
     name='pyspecs',
     version=pyspecs.__version__,
     packages=['pyspecs'],
-    scripts=['scripts/run_pyspecs.py', 'scripts/pyspecs_.py'],
+    scripts=['scripts/run_pyspecs.py'],
     url='https://github.com/mdwhatcott/pyspecs',
     license='MIT',
     author='Michael Whatcott',
