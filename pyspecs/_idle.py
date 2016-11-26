@@ -19,7 +19,7 @@ def watch(path):
         if state != new_state:
             repetitions += 1
             _display_repetitions_banner(repetitions)
-            print 'Running tests...'
+            print('Running tests...')
             run(working)
             state = new_state
         time.sleep(.75)
@@ -27,7 +27,7 @@ def watch(path):
 def run(path):
     sys.path.append(path)
 
-    print 'running', path
+    print('running', path)
 
     registry = Registry()
 
@@ -51,7 +51,7 @@ def _display_repetitions_banner(repetitions):
     number = ' {} '.format(repetitions)
     half_delimiter = (EVEN if not repetitions % 2 else ODD) * \
                      ((80 - len(number)) / 2)
-    print '\n{0}{1}{0}\n'.format(half_delimiter, number)
+    print('\n{0}{1}{0}\n'.format(half_delimiter, number))
 
 
 EVEN = '='
