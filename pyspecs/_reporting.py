@@ -43,7 +43,7 @@ class ConsoleReporter(object):
             print('')
 
         if len(failed_steps):
-            print '\n********************* FAILURES *****************\n'
+            print('\n********************* FAILURES *****************\n')
 
         for step in failed_steps:
             self.render_step(step)
