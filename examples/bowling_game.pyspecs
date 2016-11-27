@@ -156,7 +156,3 @@ with given.a_perfect_game:
 
         with then.the_score_should_equal_300:
             the(score).should.equal(300)
-
-
-if __name__ == '__main__':
-    finish()
