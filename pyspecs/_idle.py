@@ -4,7 +4,7 @@ import time
 from ._runner import _StepRunner
 from ._reporting import ConsoleReporter
 from ._registry import Registry
-from _decorators import wait_keyboard_interrupt
+from ._decorators import wait_keyboard_interrupt
 
 
 @wait_keyboard_interrupt

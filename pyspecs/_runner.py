@@ -26,5 +26,7 @@ class _StepRunner(object):
         log.debug('Procesing file %s', path)
 
         config = framework(registry)
-        execfile(path, config)
+        with open(path) as fd:
+            code = compile(fd.read(), path, 'exec', optimize=0)
+            exec(code, config)
         return config
