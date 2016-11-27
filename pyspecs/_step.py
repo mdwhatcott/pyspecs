@@ -82,7 +82,7 @@ class Step(object):
     @property
     def output(self):
         return (
-            self.stdout.buf +
+            self.stdout.getvalue() +
             ''.join([x.output for x in self.steps])
             )
 
