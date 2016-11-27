@@ -32,7 +32,7 @@ class _StepRunner(object):
             source = ''
             for line in fd.readlines():
                 # #17: just to be backwards compatible with the import line
-                if line.startswith('from pyspecs import '):
+                if line.startswith('from pyspecs.dictionary import '):
                     continue
                 source += line
         code = compile(source, path, 'exec')
