@@ -29,6 +29,6 @@ class _StepRunner(object):
 
         config = framework(registry)
         with open(path) as fd:
-            code = compile(fd.read(), path, 'exec', optimize=0)
+            code = compile(fd.read(), path, 'exec')
             exec(code, config)
         return config
