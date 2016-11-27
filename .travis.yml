@@ -1,6 +1,31 @@
 language: python
+
+sudo: false
+
 python:
   - "2.7"
   - "3.2"
   - "3.3"
-script: nosetests
+  - "3.4"
+  - "3.5"
+
+matrix:
+  include:
+    - python: "2.7"
+      env: TMODE=flake8
+env:
+    TMODE=test
+
+install:
+  - "if [[ $TMODE == 'flake8' ]]; then pip install flake8; fi"
+  - "if [[ $TMODE == 'test'   ]]; then pip install nose mock; fi"
+
+script:
+  - "if [[ $TMODE == 'flake8' ]]; then flake8 pyspecs; fi"
+  - "if [[ $TMODE == 'test'   ]]; then python scripts/run_pyspecs.py examples; fi"
+  - "if [[ $TMODE == 'test'   ]]; then nosetests; fi"
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
