@@ -16,4 +16,3 @@ class Registry(object):
     def pop(self):
         self._current_step = self._current_step.parent \
             if self._current_step else None
-

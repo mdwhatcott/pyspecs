@@ -96,7 +96,8 @@ class Step(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop = self.timer()
-        log.debug('Exiting from %s with %s,%s,%s', self.name, exc_type, exc_val, exc_tb)
+        log.debug('Exiting from %s with %s,%s,%s',
+                  self.name, exc_type, exc_val, exc_tb)
 
         self.registry.pop()
         sys.stdout = self.previous_stdout

@@ -12,10 +12,11 @@ else:
 
 class ConsoleReporter(object):
     """
-    Makes sure spec steps and aggregated statistics are reported to the console.
+    Makes sure spec steps and aggregated statistics are reported to the
+    console.
     This service is managed and invoked by the framework.
     """
-    LIST_ITEM = unichr(0x2022) # bullet
+    LIST_ITEM = unichr(0x2022)  # bullet
     INDENT = '  '
 
     def __init__(self, registry):
@@ -75,7 +76,8 @@ class ConsoleReporter(object):
         indent = self.INDENT * level
         letter = self.get_letter(step)
         print('%s | %s%s' % (letter, indent, step))
-        print('%s | %sERROR:   %s' % (letter, indent, step.result.exc_type.__name__))
+        print('%s | %sERROR:   %s'
+              % (letter, indent, step.result.exc_type.__name__))
         print('%s | %sMESSAGE: %s' % (letter, indent, step.result.exc_val))
         print(self._format_traceback(step.result.exc_tb, letter, level))
 

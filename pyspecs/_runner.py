@@ -1,8 +1,10 @@
 import os
 import logging
-log = logging.getLogger(__name__)
 
 from .framework import framework
+
+
+log = logging.getLogger(__name__)
 
 
 class _StepRunner(object):

@@ -120,8 +120,10 @@ class _Should(object):
             raise AssertionError(PREPARATION_ERROR)
 
         result = action()
-        assert (result and not self._invert) or (not result and self._invert), \
-            report()
+        if self._invert:
+            assert not result, report()
+        else:
+            assert result, report()
 
 
 NO_EXCEPTION = "'{0}' executed successfully but should have raised '{1}'!"

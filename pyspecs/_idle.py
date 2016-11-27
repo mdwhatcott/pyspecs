@@ -24,6 +24,7 @@ def watch(path):
             state = new_state
         time.sleep(.75)
 
+
 def run(path):
     sys.path.append(path)
 
@@ -36,6 +37,7 @@ def run(path):
 
     reporter = ConsoleReporter(registry)
     reporter.render(step_runner)
+
 
 def _checksums(working):
     for root, dirs, files in os.walk(working):
