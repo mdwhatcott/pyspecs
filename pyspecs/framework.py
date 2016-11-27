@@ -23,4 +23,4 @@ def framework(registry):
         it=_Should,
         this=_Should,
         that=_Should,
-        )
+    )
