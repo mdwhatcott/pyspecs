@@ -52,8 +52,14 @@ class ConsoleReporter(object):
             self.render_step(step)
             print('')
 
-        print('{steps} steps, {scenarios} scenarios in {duration} seconds'
-              .format(scenarios=len(steps), steps=registry.total_steps, duration=self.duration))
+        print(
+            '{steps} steps, {scenarios} scenarios in {duration} seconds'
+            .format(
+                scenarios=len(steps),
+                steps=registry.total_steps,
+                duration=self.duration,
+            )
+        )
 
     def _gather_stats(self, step):
         self.steps += 1

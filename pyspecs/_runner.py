@@ -2,7 +2,6 @@ import os
 import logging
 
 from .framework import framework
-from ._registry import Registry
 
 
 log = logging.getLogger(__name__)

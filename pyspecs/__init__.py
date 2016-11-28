@@ -1,6 +1,6 @@
 __version__ = '2.2'
 
-from .framework import (
+from .framework import (  # noqa
     given,
     provided,
     at,
