@@ -30,12 +30,10 @@ def run(path):
 
     print('running', path)
 
-    registry = Registry()
-
     step_runner = _StepRunner()
-    step_runner.load_steps(path, registry)
+    step_runner.load_steps(path)
 
-    reporter = ConsoleReporter(registry)
+    reporter = ConsoleReporter()
     reporter.render(step_runner)
 
 

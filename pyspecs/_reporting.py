@@ -1,6 +1,8 @@
 import sys
 import traceback
 import logging
+from ._registry import Registry
+
 log = logging.getLogger(__name__)
 if sys.version < '3':
     from StringIO import StringIO
@@ -19,7 +21,7 @@ class ConsoleReporter(object):
     LIST_ITEM = unichr(0x2022)  # bullet
     INDENT = '  '
 
-    def __init__(self, registry):
+    def __init__(self):
         self.out = sys.__stdout__
         self.duration = 0
         self.steps = 0
@@ -27,11 +29,11 @@ class ConsoleReporter(object):
         self._failures = 0
         self._passed = 0
         self._problem_reports = []
-        self._registry = registry
         self.captured = StringIO()
 
     def render(self, step_runner):
-        steps = self._registry.root_steps
+        registry = Registry()
+        steps = registry.root_steps
 
         for step in steps:
             self._gather_stats(step)
@@ -51,7 +53,7 @@ class ConsoleReporter(object):
             print('')
 
         print('{steps} steps, {scenarios} scenarios in {duration} seconds'
-              .format(scenarios=len(steps), **self.__dict__))
+              .format(scenarios=len(steps), steps=registry.total_steps, duration=self.duration))
 
     def _gather_stats(self, step):
         self.steps += 1

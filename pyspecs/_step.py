@@ -1,6 +1,9 @@
 import sys
 import time
 import logging
+from ._registry import Registry
+
+
 log = logging.getLogger(__name__)
 if sys.version < '3':
     from StringIO import StringIO
@@ -62,10 +65,9 @@ class Result(object):
 
 
 class Step(object):
-    def __init__(self, kind, name, registry, timer=time.time):
+    def __init__(self, kind, name, timer=time.time):
         self.kind = kind
         self.name = name
-        self.registry = registry
         self.timer = timer
         self.start = timer()
         self.stop = None
@@ -74,6 +76,7 @@ class Step(object):
         self.result = Result()
         self.previous_stdout = sys.stdout
         self.stdout = StringIO()
+        self.registry = Registry()
 
     @property
     def duration(self):
@@ -126,9 +129,8 @@ class Step(object):
 
 
 class StepFactory(object):
-    def __init__(self, kind, registry):
+    def __init__(self, kind):
         self.kind = kind
-        self.registry = registry
 
     def __getattr__(self, name):
         return self._create_step(name)
@@ -140,5 +142,5 @@ class StepFactory(object):
         return self._create_step(name)
 
     def _create_step(self, name):
-        step = Step(self.kind, name.replace('_', ' '), self.registry)
+        step = Step(self.kind, name.replace('_', ' '))
         return step
