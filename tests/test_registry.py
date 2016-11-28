@@ -5,12 +5,12 @@ from pyspecs._registry import Registry
 
 class RegistryTests(TestCase):
     def test_has_no_root_steps_by_default(self):
-        registry = Registry()
+        registry = Registry().reset()
 
         self.assertEquals([], registry.root_steps)
 
     def test_support_adding_steps(self):
-        registry = Registry()
+        registry = Registry().reset()
         step = Mock()
 
         ret_value = registry.push(step)
@@ -19,7 +19,7 @@ class RegistryTests(TestCase):
         self.assertEquals(None, ret_value)
 
     def test_adding_a_descendant_step_returns_the_parent(self):
-        registry = Registry()
+        registry = Registry().reset()
         step1 = Mock()
         step2 = Mock()
 
@@ -31,12 +31,12 @@ class RegistryTests(TestCase):
         self.assertEquals([step1], registry.root_steps)
 
     def test_pop_returns_none_if_no_steps(self):
-        registry = Registry()
+        registry = Registry().reset()
 
         self.assertEquals(None, registry.pop())
 
     def test_pop_does_not_fail_if_step_has_no_parent(self):
-        registry = Registry()
+        registry = Registry().reset()
         step = Mock()
         step.parent = None
         registry.push(step)
@@ -44,7 +44,7 @@ class RegistryTests(TestCase):
         self.assertEquals(None, registry.pop())
 
     def test_pushing_after_popping_creates_a_new_root_step(self):
-        registry = Registry()
+        registry = Registry().reset()
         step1 = Mock()
         step1.parent = None
         step2 = Mock()

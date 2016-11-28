@@ -65,7 +65,7 @@ class Result(object):
 
 
 class Step(object):
-    def __init__(self, kind, name, timer=time.time):
+    def __init__(self, kind, name, registry=None, timer=time.time):
         self.kind = kind
         self.name = name
         self.timer = timer
@@ -76,7 +76,7 @@ class Step(object):
         self.result = Result()
         self.previous_stdout = sys.stdout
         self.stdout = StringIO()
-        self.registry = Registry()
+        self.registry = registry or Registry()
 
     @property
     def duration(self):
@@ -129,8 +129,9 @@ class Step(object):
 
 
 class StepFactory(object):
-    def __init__(self, kind):
+    def __init__(self, kind, registry=None):
         self.kind = kind
+        self._registry = registry
 
     def __getattr__(self, name):
         return self._create_step(name)
@@ -142,5 +143,5 @@ class StepFactory(object):
         return self._create_step(name)
 
     def _create_step(self, name):
-        step = Step(self.kind, name.replace('_', ' '))
+        step = Step(self.kind, name.replace('_', ' '), self._registry)
         return step

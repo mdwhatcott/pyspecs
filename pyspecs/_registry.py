@@ -10,6 +10,12 @@ class Registry(object):
                                 cls, *args, **kwargs)
         return cls._instance
 
+    def reset(self):
+        self._current_step = None
+        self.root_steps = []
+        self.total_steps = 0
+        return self
+
     def push(self, step):
         self.total_steps += 1
         previous = self._current_step
